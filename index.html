@@ -832,9 +832,16 @@
     <label>URL do Google Apps Script</label><input type="text" id="set-gs-url" placeholder="https://script.google.com/macros/s/..." oninput="saveSettings()">
     <label>Nome / identificação</label><input type="text" id="set-nome" placeholder="ex: Afonso Gonçalves" oninput="saveSettings()">
     
-    <button class="btn btn-purple" onclick="exportToExcel()" style="width:100%; margin-bottom:14px; background-color: #534AB7; border-color: #534AB7; color: white;">
-      📥 Exportar Backup Local (Excel)
+    <button class="btn btn-purple" onclick="exportToExcel()" style="width:100%; margin-bottom:10px; background-color: #534AB7; border-color: #534AB7; color: white;">
+      📥 Exportar Backup Local (CSV)
     </button>
+
+    <label style="position:relative; display:block; margin-bottom:14px;">
+      <div class="btn" style="width:100%; background:#0F6E56; color:white; border-color:#0F6E56; font-size:15px; font-weight:600; padding:13px; border-radius:12px; text-align:center; cursor:pointer;">
+        📤 Importar CSV
+      </div>
+      <input type="file" accept=".csv" onchange="importFromCSV(this)" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
+    </label>
 
     <button class="btn btn-primary" onclick="closeSettings(null)" style="width:100%;margin-top:4px">Fechar</button>
   </div>
@@ -1708,7 +1715,86 @@ function exportToExcel() {
   document.body.removeChild(link);
 }
 
-// ─── STATS ENGINE ─────────────────────────────────────────────────────────────
+// ─── IMPORT CSV ───────────────────────────────────────────────────────────────
+function importFromCSV(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var text = e.target.result;
+      // Remove BOM if present
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
+      var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+      if (lines.length < 2) { alert('Ficheiro CSV vazio ou inválido.'); return; }
+
+      // Detect separator: ; or ,
+      var sep = lines[0].indexOf(';') !== -1 ? ';' : ',';
+
+      // Parse header
+      var headers = parseCSVLine(lines[0], sep);
+
+      // Parse rows
+      var imported = [];
+      for (var i = 1; i < lines.length; i++) {
+        var vals = parseCSVLine(lines[i], sep);
+        if (vals.length === 0) continue;
+        var obj = {};
+        headers.forEach(function(h, idx) {
+          var v = vals[idx] !== undefined ? vals[idx] : '';
+          // Try to restore arrays (fields that look like JSON arrays)
+          if (v.startsWith('[')) {
+            try { v = JSON.parse(v); } catch(e) {}
+          }
+          obj[h] = v;
+        });
+        imported.push(obj);
+      }
+
+      if (imported.length === 0) { alert('Nenhum registo encontrado no CSV.'); return; }
+
+      var existing = getRecords();
+      var msg = 'Foram encontrados ' + imported.length + ' registos no ficheiro.\n\n' +
+        'O que queres fazer?\n' +
+        '• OK = Adicionar aos ' + existing.length + ' registos existentes\n' +
+        '• Cancelar = Não importar';
+
+      if (!confirm(msg)) { input.value = ''; return; }
+
+      var merged = existing.concat(imported);
+      localStorage.setItem('casuistica', JSON.stringify(merged));
+      input.value = '';
+      closeSettings(null);
+      alert('✅ ' + imported.length + ' registos importados com sucesso! Total: ' + merged.length + ' casos.');
+    } catch(err) {
+      alert('Erro ao processar o ficheiro: ' + err.message);
+      input.value = '';
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseCSVLine(line, sep) {
+  var result = [];
+  var cur = '';
+  var inQuotes = false;
+  for (var i = 0; i < line.length; i++) {
+    var ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if (ch === sep && !inQuotes) {
+      result.push(cur); cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+
 var currentStatTab = 'global';
 var currentEstagioFilter = null;
 
@@ -2156,15 +2242,15 @@ function openCaseDetail(origIdx, chronoNum) {
   ]) +
   section('Procedimento', [
     row('Cirurgia', procs),
-    row('Posição', r.posicionamento),
+    row('Posição', r.posicao),
     row('Duração', r.duracao),
-    row('Destino pós-op', r.destino)
+    row('Destino pós-op', r.destino_pos_op)
   ]) +
   section('Técnica Anestésica', [
-    row('Técnica', r.tecnica_anest),
-    row('Via aérea', r.abord_va),
+    row('Técnica', r.tecnica_anestesica),
+    row('Via aérea', r.abordagem_va),
     row('Método VA', r.metodo_va),
-    row('Tubo OT', r.tubo_ot_tamanho ? r.tubo_ot_tamanho + ' ' + (r.tubo_ot_tipo||'') : ''),
+    row('Tubo OT', r.tubo_orotraqueal),
     row('Neuroeixo', neuroeixo),
     row('BNP', bnp),
     row('Orientação BNP', r.orientacao_bnp)
@@ -2179,20 +2265,15 @@ function openCaseDetail(origIdx, chronoNum) {
     row('Via aérea', r.autonomia_va),
     row('Neuroeixo', r.autonomia_neuroeixo),
     row('BNP', r.autonomia_bnp),
-    row('Arterial', r.autonomia_arterial),
-    row('CVC', r.autonomia_cvc)
+    row('Geral', r.autonomia_geral)
   ]) +
   section('Complicações & Notas', [
     row('Complicações', compl),
     row('Observações', r.observacoes)
   ]) +
-  '<div style="display:flex;gap:10px;margin-top:8px">' +
-    '<div onclick="editCase(' + origIdx + ')" style="flex:1;padding:14px;background:var(--blue-light);border:0.5px solid rgba(24,95,165,0.3);border-radius:12px;color:var(--blue-dark);font-size:14px;font-weight:600;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">' +
-      '<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--blue-dark);fill:none;stroke-width:2;stroke-linecap:round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar' +
-    '</div>' +
-    '<div class="case-del-btn" onclick="deleteCaseFromDetail(' + origIdx + ',\'' + escHtml(chronoNum+'') + '\')" style="flex:1">' +
-      '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>Apagar' +
-    '</div>' +
+  '<div class="case-del-btn" onclick="deleteCaseFromDetail(' + origIdx + ',\'' + escHtml(chronoNum+'') + '\')">' +
+    '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
+    'Apagar este caso' +
   '</div>';
 
   document.getElementById('case-body').innerHTML = html;
@@ -2210,178 +2291,6 @@ function deleteCaseFromDetail(origIdx, num) {
   localStorage.setItem('casuistica', JSON.stringify(records));
   closeCaseDetail();
   renderHistList();
-}
-
-// ─── EDIÇÃO DE CASO EXISTENTE ──────────────────────────────────────────────────
-
-var editingIdx = null; // índice no localStorage do caso em edição
-
-function editCase(origIdx) {
-  var records = getRecords();
-  var r = records[origIdx];
-  if (!r) return;
-
-  editingIdx = origIdx;
-
-  // Fechar overlays
-  closeCaseDetail();
-  closeHist();
-
-  // Limpar o formulário
-  newRecord();
-
-  // Preencher todos os campos com os dados do caso
-  var d = r;
-
-  // Campos de texto simples
-  function setVal(id, val) { var el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; }
-  function setSel(id, val) {
-    if (!val) return;
-    var el = document.getElementById(id);
-    if (!el) return;
-    for (var i = 0; i < el.options.length; i++) {
-      if (el.options[i].value === val || el.options[i].text === val) { el.selectedIndex = i; return; }
-    }
-  }
-  function setChips(gid, valStr) {
-    if (!valStr || valStr === '—') return;
-    var vals = valStr.split(' | ').map(function(v){ return v.trim().toLowerCase(); });
-    var el = document.getElementById(gid);
-    if (!el) return;
-    el.querySelectorAll('.chip').forEach(function(c){
-      if (vals.indexOf(c.textContent.trim().toLowerCase()) !== -1) c.classList.add('on');
-    });
-  }
-
-  setVal('f-data', d.data);
-  setVal('f-nsc', d.nsc);
-  setSel('f-sexo', d.sexo);
-  setVal('f-idade', d.idade);
-  setVal('f-peso', d.peso);
-  setVal('f-altura', d.altura);
-  setVal('f-imc', d.imc);
-  setSel('f-estagio', d.estagio); if (d.estagio) onEstagioChange();
-  setSel('f-regime', d.regime);
-  setSel('f-asa', d.asa);
-  setSel('f-posicao', d.posicionamento);
-  setSel('f-destino', d.destino);
-  setVal('f-obs', d.observacoes);
-  setVal('f-diagnostico', d.diagnostico);
-  setVal('f-tubo-size', d.tubo_ot_tamanho);
-  setVal('f-vol-neuroeixo', d.vol_al_neuroeixo);
-  setVal('f-vol-bnp', d.vol_al_bnp);
-  setVal('f-uces-num', d.uces_num);
-
-  // Procedimentos
-  if (d.procedimentos) {
-    var procs = d.procedimentos.split(' | ');
-    procs.forEach(function(p){ if (p.trim()) addProc(p.trim(), false); });
-  }
-
-  // Chips
-  setChips('chips-tec', d.tecnica_anest); updateFarms();
-  setChips('chips-dur', d.duracao);
-  setChips('chips-va', d.abord_va); checkTuboSize();
-  setChips('chips-va2', d.metodo_va);
-  setChips('chips-aut-va', d.autonomia_va);
-  setChips('chips-tubo-tipo', d.tubo_ot_tipo);
-  setChips('chips-tentativas', d.tentativas_intubacao);
-  setChips('chips-vad-simnao', d.vad_sim_nao);
-  setChips('chips-vad-crit', d.vad_criterios);
-  setChips('chips-cent', d.neuroeixo);
-  setChips('chips-aut-cent', d.autonomia_neuroeixo);
-  setChips('chips-bnp', d.bnp);
-  setChips('chips-aut-bnp', d.autonomia_bnp);
-  setChips('chips-guia-bnp', d.orientacao_bnp);
-  setChips('chips-al-farmaco', d.al_farmaco);
-  setChips('chips-al-conc', d.al_concentracao);
-  setChips('chips-al-adjuv', d.al_adjuvantes);
-  setChips('chips-mon', d.monitorizacao);
-  setChips('chips-dc-metodo', d.dc_metodo);
-  setChips('chips-art', d.acesso_arterial);
-  setChips('chips-metodo-art', d.metodo_arterial);
-  setChips('chips-aut-art', d.autonomia_arterial);
-  setChips('chips-cvc', d.cvc);
-  setChips('chips-metodo-cvc', d.metodo_cvc);
-  setChips('chips-aut-cvc', d.autonomia_cvc);
-  setChips('chips-sangue', d.sangue_fluidos);
-  setChips('chips-exclusao', d.exclusao_pulmonar);
-  setChips('chips-complicacoes', d.complicacoes);
-  setChips('chips-participacao', d.participacao_global);
-  setChips('chips-inducao', d.farmacos_inducao_bal);
-  setChips('chips-inducao-ina', d.farmacos_inducao_ina);
-  setChips('chips-manutencao', d.farmacos_manutencao);
-  setChips('chips-tiva', d.tiva_modelos);
-  setChips('chips-sedacao', d.farmacos_sedacao);
-  setChips('chips-bnm', d.bnm);
-  setChips('chips-reversao', d.reversao);
-
-  // Mostrar blocos de autonomia se chips activos
-  if (document.getElementById('chips-va').querySelector('.chip.on')) document.getElementById('aut-va-box').classList.remove('hidden');
-  if (document.getElementById('chips-cent').querySelector('.chip.on')) document.getElementById('aut-cent-box').classList.remove('hidden');
-  if (document.getElementById('chips-bnp').querySelector('.chip.on')) document.getElementById('aut-bnp-box').classList.remove('hidden');
-  if (document.getElementById('chips-art').querySelector('.chip.on')) document.getElementById('aut-art-box').classList.remove('hidden');
-  if (document.getElementById('chips-cvc').querySelector('.chip.on')) document.getElementById('aut-cvc-box').classList.remove('hidden');
-  if (d.sangue_fluidos && d.sangue_fluidos.indexOf('Transfusão UCEs') !== -1) document.getElementById('box-uces').classList.remove('hidden');
-
-  checkExclusaoPulmonar();
-
-  // Banner de edição
-  showEditBanner();
-  goTo(1);
-}
-
-function showEditBanner() {
-  var existing = document.getElementById('edit-mode-banner');
-  if (existing) existing.remove();
-  var banner = document.createElement('div');
-  banner.id = 'edit-mode-banner';
-  banner.style.cssText = 'background:var(--amber-light);border:0.5px solid #d4a017;border-radius:10px;padding:10px 14px;margin:0 16px 10px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a5800;font-weight:500;position:sticky;top:56px;z-index:50;';
-  banner.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#7a5800;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
-    '<span style="flex:1">A editar um caso existente</span>' +
-    '<span style="cursor:pointer;font-size:18px;line-height:1;opacity:0.6" onclick="cancelEdit()">✕</span>';
-  document.querySelector('.content').prepend(banner);
-}
-
-function cancelEdit() {
-  editingIdx = null;
-  var b = document.getElementById('edit-mode-banner');
-  if (b) b.remove();
-  newRecord();
-}
-
-// Substituir submitRecord para suportar edição
-var _origSubmitRecord = submitRecord;
-function submitRecord() {
-  if (editingIdx === null) { _origSubmitRecord(); return; }
-
-  var data = collectData();
-  var gsUrl = getSetting('gsUrl');
-  var okMsg = document.getElementById('ok-msg');
-  if (!data.data || !data.estagio) { alert('Preenche a data e o estágio antes de guardar.'); return; }
-
-  goTo(6);
-  document.querySelectorAll('.step-pill').forEach(function(p){ p.classList.remove('active'); p.classList.add('done'); });
-
-  // Substituir o registo existente em vez de adicionar
-  try {
-    var s = JSON.parse(localStorage.getItem('casuistica') || '[]');
-    data.timestamp = new Date().toISOString(); // atualizar timestamp
-    s[editingIdx] = data;
-    localStorage.setItem('casuistica', JSON.stringify(s));
-  } catch(e) {}
-
-  editingIdx = null;
-  var b = document.getElementById('edit-mode-banner');
-  if (b) b.remove();
-
-  okMsg.textContent = 'Caso atualizado com sucesso!';
-
-  if (gsUrl && gsUrl.startsWith('https://')) {
-    fetch(gsUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-    .then(function() { okMsg.textContent = 'Caso atualizado localmente e reenviado para Google Sheets.'; })
-    .catch(function() { okMsg.textContent = 'Caso atualizado localmente. Verifica a ligação ao Google Sheets.'; });
-  }
 }
 
 function escHtml(str) {
