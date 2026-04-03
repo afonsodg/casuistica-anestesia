@@ -572,6 +572,11 @@
     <label>Chave API do Claude</label><input type="password" id="set-api-key" placeholder="sk-ant-..." oninput="saveSettings()">
     <label>URL do Google Apps Script</label><input type="text" id="set-gs-url" placeholder="https://script.google.com/macros/s/..." oninput="saveSettings()">
     <label>Nome / identificação</label><input type="text" id="set-nome" placeholder="ex: Afonso Gonçalves" oninput="saveSettings()">
+    
+    <button class="btn btn-purple" onclick="exportToExcel()" style="width:100%; margin-bottom:14px; background-color: #534AB7; border-color: #534AB7; color: white;">
+      📥 Exportar Backup Local (Excel)
+    </button>
+
     <button class="btn btn-primary" onclick="closeSettings(null)" style="width:100%;margin-top:4px">Fechar</button>
   </div>
 </div>
@@ -587,8 +592,11 @@ var PROCS = {
     { label:"Endócrino / outros", freq:["Tiroidectomia total","Tiroidectomia parcial","Adrenalectomia (laparoscopia)","Colocação de CVCTI","Laparoscopia de estadiamento + CVCTI","Laparotomia exploradora"], others:["Paratiroidectomia","Linfadenectomia retroperitoneal"] }
   ]},
   "Cirurgia Geral (HPV)": { sections: [
-    { label:"Hepato-bilio-pancreático", freq:["Colecistectomia (laparoscopia)","Hepatectomia direita (laparotomia)","Hepatectomia esquerda (laparotomia)","Hepatectomia (laparoscopia)","Whipple – duodenopancreatectomia cefálica","Pancreatectomia distal (laparotomia)","Pancreatectomia distal (laparoscopia)"], others:["Ablação tumoral (microondas/RF)","Quistectomia hepática","ALPPS","Hepaticojejunostomia","Splenectomia (laparoscopia)"] },
-    { label:"Outros", freq:["Laparoscopia de estadiamento","Laparotomia exploradora","Colocação de CVCTI"], others:[] }
+    { label:"CVC implantado (subclávia – quimio)", freq:["Colocação de CVC implantado subclávia (câmara implantável)","Remoção de CVC implantado subclávia","Revisão / substituição de CVC implantado"], others:["Colocação de CVC implantado jugular","Colocação de PICC"] },
+    { label:"Obesidade", freq:["Sleeve gástrico (laparoscopia)","Bypass gástrico em Y-de-Roux (laparoscopia)","Banda gástrica – colocação (laparoscopia)","Banda gástrica – remoção (laparoscopia)","Bypass gástrico de revisão (laparoscopia)"], others:["Duodenal switch (laparoscopia)","Plicatura gástrica (laparoscopia)","Balão intragástrico (sedação/endoscopia)","Sleeve de revisão (laparoscopia)"] },
+    { label:"Tiróide e paratiroides", freq:["Tiroidectomia total","Tiroidectomia parcial / hemitiroidectomia","Paratiroidectomia"], others:["Tiroidectomia total + esvaziamento cervical","Reoperação tiroideia"] },
+    { label:"Varizes", freq:["Safenectomia (stripping)","Flebectomia por microcisões","Ablação endovenosa a laser (EVLA)","Ablação por radiofrequência (RFA)","Escleroterapia de varizes","Ligadura de perfurantes"], others:["Flebectomia ambulatória isolada","Crossectomia + stripping parcial"] },
+    { label:"Parede abdominal e tecidos moles", freq:["Hernioplastia inguinal","Hernioplastia umbilical","Hernioplastia epigástrica","Hernioplastia incisional","TAPP / TEP (laparoscopia)","Excisão de quisto sebáceo / lipoma","Excisão de quisto pilonidal","Drenagem de abcesso pilonidal"], others:["Hernioplastia femoral","Hernioplastia de Spiegel","Excisão de quisto epidermoide"] }
   ]},
   "Urologia": { sections: [
     { label:"Próstata", freq:["RTU-P","Prostatectomia radical (laparoscopia)","Prostatectomia radical (robótico)","Prostatectomia radical (laparotomia)"], others:["Braquiterapia prostática","Incisão colo vesical"] },
@@ -847,12 +855,16 @@ function checkUces(el) {
 }
 
 function getSangueFluidos() {
-  var arr = getChipsArray('chips-sangue');
-  var idx = arr.indexOf('Transfusão UCEs');
-  if (idx !== -1) {
-    var num = document.getElementById('f-uces-num').value;
-    if (num) arr[idx] = 'Transfusão UCEs (' + num + ')';
-  }
+  var arr = [];
+  document.getElementById('chips-sangue').querySelectorAll('.chip.on').forEach(function(c){
+    var txt = c.textContent.trim();
+    if (txt === 'Transfusão UCEs') {
+      var num = document.getElementById('f-uces-num').value;
+      arr.push('Transfusão UCEs' + (num ? ' (' + num + ')' : ''));
+    } else {
+      arr.push(txt);
+    }
+  });
   return arr.join(', ') || '—';
 }
 
@@ -1087,6 +1099,40 @@ function newRecord() {
   document.querySelectorAll('.autonomy-bar').forEach(function(b){ b.classList.add('hidden'); });
   
   setVAD(false); updateFarms(); checkExclusaoPulmonar(); goTo(0);
+}
+
+function exportToExcel() {
+  const rawData = localStorage.getItem('casuistica');
+  if (!rawData) {
+    alert("Não existem registos guardados na memória do telemóvel.");
+    return;
+  }
+  const data = JSON.parse(rawData);
+  if (data.length === 0) {
+    alert("O histórico local está vazio.");
+    return;
+  }
+
+  // Criar cabeçalhos a partir das chaves do primeiro objeto
+  const headers = Object.keys(data[0]);
+  let csvContent = headers.join(";") + "\n"; 
+
+  data.forEach(row => {
+    let rowValues = headers.map(header => {
+      let val = row[header] === undefined ? "" : row[header];
+      return `"${String(val).replace(/"/g, '""')}"`;
+    });
+    csvContent += rowValues.join(";") + "\n";
+  });
+
+  const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Backup_Casuistica_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
