@@ -491,7 +491,15 @@
     <div class="card">
       <div class="card-header">Fluidos e Sangue</div>
       <div class="chip-wrap">
-        <div class="chips" id="chips-sangue"><div class="chip" onclick="toggle(this)">Cell-Saver</div><div class="chip" onclick="toggle(this)">Transfusão CGR</div><div class="chip" onclick="toggle(this)">Transfusão PFC/Plaquetas</div></div>
+        <div class="chips" id="chips-sangue">
+          <div class="chip" onclick="toggle(this)">Cell-Saver</div>
+          <div class="chip" onclick="checkUces(this)">Transfusão UCEs</div>
+          <div class="chip" onclick="toggle(this)">Transfusão PFC/Plaquetas</div>
+        </div>
+        <div class="autonomy-bar hidden" id="box-uces" style="display:flex; align-items:center; gap:10px; margin-top:12px;">
+          <span class="sublabel" style="margin:0;">Nº de UCEs administradas:</span>
+          <input type="number" id="f-uces-num" placeholder="0" min="1" style="width:60px; padding:6px; border-radius:8px; border:0.5px solid var(--gray-border-strong); text-align:center; font-size:14px; background:var(--surface); color:var(--text); outline:none;">
+        </div>
       </div>
     </div>
 
@@ -826,6 +834,28 @@ function checkAutonomy(el, barId, isSolo) {
   else { bar.classList.add('hidden'); bar.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); }
 }
 
+function checkUces(el) {
+  el.classList.toggle('on');
+  var box = document.getElementById('box-uces');
+  if (el.classList.contains('on')) {
+    box.classList.remove('hidden');
+    document.getElementById('f-uces-num').focus();
+  } else {
+    box.classList.add('hidden');
+    document.getElementById('f-uces-num').value = '';
+  }
+}
+
+function getSangueFluidos() {
+  var arr = getChipsArray('chips-sangue');
+  var idx = arr.indexOf('Transfusão UCEs');
+  if (idx !== -1) {
+    var num = document.getElementById('f-uces-num').value;
+    if (num) arr[idx] = 'Transfusão UCEs (' + num + ')';
+  }
+  return arr.join(', ') || '—';
+}
+
 function getChipsArray(gid) {
   var arr = []; var el = document.getElementById(gid);
   if (!el) return arr;
@@ -880,7 +910,7 @@ function runScan() {
   document.getElementById('scan-btn').style.display = 'none'; document.getElementById('scan-zone').style.display = 'none';
   document.getElementById('preview-img').style.display = 'none'; document.getElementById('scan-overlay').style.display = 'flex';
 
-  var prompt = 'Analisa este relatório anestésico / folha cirúrgica e extrai as informações em JSON estritamente válido, sem markdown, sem texto adicional:\n{"nsc":"numero do processo ou null", "sexo":"Masculino|Feminino|null", "idade":"numero ou null", "peso":"numero ou null", "altura":"numero ou null", "data":"YYYY-MM-DD ou null","estagio":"Cirurgia Geral|Cirurgia Geral (HPV)|Urologia|Oftalmologia|UCPA|Ginecologia|Ortopedia|Obstetrícia|Ambulatório|ORL|Dor Aguda|Cirurgia Plástica|AFBO|Vascular|UCIP|Neurocirurgia|Pediatria|Doente Crítico|U. Queimados|Dor Crónica|HG1|Cardíaca|Torácica|Urgência|ECDT|null","regime":"Programada – internamento|Programada – ambulatório|Urgência|null","procedimentos":["lista"],"asa":"I|II|III|IV|V|VI|null","tecnica_anestesica":"AG balanceada|AG endovenosa (TIVA)|AG inalatória|BSA (subaracnoideu)|Epidural|Sequencial|BNP isolado|Sedação|CAM|Combinada|null","duracao":"<60 min|1–3 h|>3 h|null","abordagem_va":"IOT|Nasotraqueal|Submentoniana|Máscara laríngea|Máscara facial|Sem abordagem|Ligação ao ventilador|Jet ventilation|null","metodo_va":"Laringoscopia direta|Videolaringoscopia|Broncofibroscopia|Awake intubation|Lâmina McCoy|N/A|null","neuroeixo":["Subaracnoideu|Epidural lombar|Epidural torácica|Sequencial|Nenhuma"],"bnp":["lista de BNPs"],"orientacao_bnp":"Ecoguiado|Neuroestimulação|Referências anatómicas|N/A|null","monitorizacao":["BIS|TOF|PAI|PVC|Débito urinário|Temp. central|PIC|Ecocardiografia|NIRS|Nenhuma"],"acesso_arterial":["Linha radial|Linha umeral|Linha femoral|Ecoguiada"],"cvc":["Jugular interno|Subclávia|Femoral|CVCTI|DVE|Ecoguiado"],"observacoes":"texto livre ou null"}\nSe não visível usa null ou []. Responde APENAS com o JSON.';
+  var prompt = 'Analisa este relatório anestésico / folha cirúrgica e extrai as informações em JSON estritamente válido, sem markdown, sem texto adicional:\n{"nsc":"numero do processo ou null", "sexo":"Masculino|Feminino|null", "idade":"numero ou null", "peso":"numero ou null", "altura":"numero ou null", "data":"YYYY-MM-DD ou null","estagio":"Cirurgia Geral|Cirurgia Geral (HPV)|Urologia|Oftalmologia|UCPA|Ginecologia|Ortopedia|Obstetrícia|Ambulatório|ORL|Dor Aguda|Cirurgia Plástica|AFBO|Vascular|UCIP|Neurocirurgia|Pediatria|Doente Crítico|U. Queimados|Dor Crónica|HG1|Cardíaca|Torácica|Urgência|ECDT|null","regime":"Programada – internamento|Programada – ambulatório|Urgência|null","procedimentos":["lista"],"asa":"I|II|III|IV|V|VI|null","tecnica_anestesica":"AG balanceada|AG endovenosa (TIVA)|AG inalatória|BSA (subaracnoideu)|Epidural|Sequencial|BNP isolado|Sedação|CAM|Combinada|null","duracao":"<60 min|1–3 h|>3 h|null","abordagem_va":"IOT|Nasotraqueal|Submentoniana|Máscara laríngea|Máscara facial|Sem abordagem|Ligação ao ventilador|Jet ventilation|null","metodo_va":"Laringoscopia direta|Videolaringoscopia|Broncofibroscopia|Awake intubation|Lâmina McCoy|N/A|null","neuroeixo":["Subaracnoideu|Epidural lombar|Epidural torácica|Sequencial|Nenhuma"],"bnp":["lista de BNPs"],"orientacao_bnp":"Ecoguiado|Neuroestimulação|Referências anatómicas|N/A|null","monitorizacao":["BIS|TOF|PAI|PVC|Débito urinário|Temp. central|PIC|Ecocardiografia|NIRS|Nenhuma"],"acesso_arterial":["Linha radial|Linha umeral|Linha femoral|Ecoguiada"],"cvc":["Jugular interno|Subclávia|Femoral|CVCTI|DVE|Ecoguiado"],"sangue_fluidos":["Cell-Saver","Transfusão UCEs","Transfusão PFC/Plaquetas"],"observacoes":"texto livre ou null"}\nSe não visível usa null ou []. Responde APENAS com o JSON.';
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
@@ -913,9 +943,13 @@ function applyAIData(d) {
   setChip('chips-dur', d.duracao); setChip('chips-va', d.abordagem_va); setChip('chips-va2', d.metodo_va);
   setChip('chips-cent', d.neuroeixo); setChip('chips-bnp', d.bnp); setChip('chips-guia-bnp', d.orientacao_bnp);
   setChip('chips-mon', d.monitorizacao); setChip('chips-art', d.acesso_arterial); setChip('chips-cvc', d.cvc);
-  // Capturar também se a IA disse "Ecoguiada" nos acessos e colocar nos métodos apropriados:
   setChip('chips-metodo-art', d.acesso_arterial); setChip('chips-metodo-cvc', d.cvc);
   
+  setChip('chips-sangue', d.sangue_fluidos);
+  if(getChipsArray('chips-sangue').indexOf('Transfusão UCEs') !== -1) {
+    document.getElementById('box-uces').classList.remove('hidden');
+  }
+
   if(d.observacoes && d.observacoes!=='null') document.getElementById('f-obs').value=d.observacoes;
   
   // Show autonomy blocks if any selection was made
@@ -946,6 +980,7 @@ function buildReview() {
     ['Neuro-eixo', getChips('chips-cent') + (getChips('chips-cent')!=='—' ? ' ('+getChips('chips-aut-cent')+')':'')],
     ['BNP', getChips('chips-bnp') + (getChips('chips-bnp')!=='—' ? ' ['+getChips('chips-guia-bnp')+'] ('+getChips('chips-aut-bnp')+')':'')],
     ['Posicionamento', document.getElementById('f-posicao').value || '—'],
+    ['Fluidos e Sangue', getSangueFluidos()],
     ['Complicações', getChips('chips-complicacoes')]
   ];
   var html = '<div class="card-header">Resumo</div>';
@@ -1007,7 +1042,7 @@ function collectData() {
     autonomia_cvc: getChips('chips-aut-cvc'),
     
     exclusao_pulmonar: getChips('chips-exclusao'),
-    sangue_fluidos: getChips('chips-sangue'),
+    sangue_fluidos: getSangueFluidos(),
     
     posicionamento: document.getElementById('f-posicao').value,
     destino: document.getElementById('f-destino').value,
@@ -1040,7 +1075,7 @@ function newRecord() {
   selectedProcs = []; aiProcs = []; imageBase64 = null; renderSelected();
   document.getElementById('proc-lists').innerHTML = '';
   document.getElementById('f-data').value = today;
-  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc'].forEach(function(id){document.getElementById(id).value='';});
+  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc','f-uces-num'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('f-asa').selectedIndex = 1; document.getElementById('f-posicao').selectedIndex = 0;
   
   document.getElementById('preview-img').style.display = 'none'; document.getElementById('scan-btn').style.display = 'none';
