@@ -2,20 +2,21 @@
   "name": "Casuística Anestesia",
   "short_name": "Casuística",
   "description": "Registo de atos anestésicos – Internato CHULN",
-  "start_url": "/",
+  "start_url": "/casuistica-anestesia/",
+  "scope": "/casuistica-anestesia/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#185FA5",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/casuistica-anestesia/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "/casuistica-anestesia/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
