@@ -156,6 +156,55 @@
   .settings-panel { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 16px calc(20px + var(--safe-bottom)); width: 100%; max-height: 80vh; overflow-y: auto; }
   .settings-handle { width: 36px; height: 4px; background: var(--gray-border-strong); border-radius: 2px; margin: 0 auto 16px; }
   .settings-panel input { width: 100%; border: 0.5px solid var(--gray-border-strong); border-radius: 10px; padding: 10px 12px; font-size: 13px; background: var(--gray-bg); outline: none; margin-bottom: 14px; }
+
+  /* STATS SCREEN */
+  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .kpi-card { background: var(--surface); border: 0.5px solid var(--gray-border); border-radius: 12px; padding: 14px; text-align: center; }
+  .kpi-num { font-size: 28px; font-weight: 700; color: var(--blue); line-height: 1; }
+  .kpi-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .kpi-card.green .kpi-num { color: var(--green); }
+  .kpi-card.purple .kpi-num { color: var(--purple); }
+  .kpi-card.red .kpi-num { color: var(--red); }
+  .stat-card { background: var(--surface); border: 0.5px solid var(--gray-border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .stat-card-header { padding: 8px 14px; border-bottom: 0.5px solid var(--gray-border); font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.4px; text-transform: uppercase; background: var(--gray-bg); }
+  .stat-bar-row { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 0.5px solid var(--gray-border); }
+  .stat-bar-row:last-child { border-bottom: none; }
+  .stat-bar-label { font-size: 12px; color: var(--text); min-width: 120px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+  .stat-bar-wrap { flex: 1; background: var(--gray-bg); border-radius: 4px; height: 8px; overflow: hidden; }
+  .stat-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .stat-bar-val { font-size: 12px; color: var(--text-muted); min-width: 22px; text-align: right; font-weight: 600; }
+  .donut-wrap { display: flex; align-items: center; gap: 16px; padding: 14px; }
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  .donut-legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text); }
+  .donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .donut-pct { margin-left: auto; font-weight: 600; color: var(--text-muted); font-size: 11px; }
+  .stat-empty { padding: 40px 20px; text-align: center; color: var(--text-faint); font-size: 14px; }
+  .stat-tab-bar { display: flex; background: var(--surface); border-bottom: 0.5px solid var(--gray-border); margin-bottom: 14px; border-radius: 0; }
+  .stat-tab { flex: 1; padding: 10px 4px; font-size: 12px; font-weight: 500; text-align: center; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
+  .stat-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .stat-section { display: none; }
+  .stat-section.show { display: block; }
+  .filter-bar { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 14px; padding-bottom: 2px; }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--gray-border-strong); background: var(--gray-bg); color: var(--text); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .filter-chip.on { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue-dark); font-weight: 600; }
+  .stats-overlay { display: none; position: fixed; inset: 0; z-index: 150; background: var(--gray-bg); overflow-y: auto; padding-top: var(--safe-top); }
+  .stats-overlay.show { display: block; }
+  .stats-topbar { background: var(--surface); border-bottom: 0.5px solid var(--gray-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 10; }
+  .stats-topbar h2 { font-size: 17px; font-weight: 600; flex: 1; }
+  .stats-body { padding: 12px 16px; }
+  .icon-btn.stats-active { background: var(--blue-light); border-color: var(--blue-mid); }
+  .icon-btn.stats-active svg { stroke: var(--blue); }
+  .autonomy-stacked { display: flex; height: 12px; border-radius: 6px; overflow: hidden; gap: 2px; margin: 8px 14px 12px; }
+  .autonomy-stacked-seg { height: 100%; transition: width 0.6s ease; }
+  .autonomy-legend { display: flex; gap: 12px; padding: 0 14px 10px; flex-wrap: wrap; }
+  .autonomy-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); }
+  .month-bar-wrap { padding: 10px 14px 14px; }
+  .month-bars { display: flex; align-items: flex-end; gap: 5px; height: 70px; }
+  .month-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .month-bar { width: 100%; background: var(--blue-light); border: 0.5px solid var(--blue-mid); border-radius: 3px 3px 0 0; transition: height 0.5s ease; min-height: 2px; }
+  .month-bar-lbl { font-size: 9px; color: var(--text-faint); text-align: center; }
+  .month-bar-num { font-size: 9px; color: var(--blue-dark); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -170,6 +219,9 @@
       <p>Internato Anestesiologia · ULS Santa Maria</p>
     </div>
     <div class="topbar-actions">
+      <div class="icon-btn" id="stats-btn" onclick="openStats()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
       <div class="icon-btn" onclick="openSettings()">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </div>
@@ -566,7 +618,52 @@
     </div>
   </div>
 
-  </div></div><div class="settings-overlay" id="settings-overlay" onclick="closeSettings(event)">
+  </div></div>
+
+<!-- STATS OVERLAY -->
+<div class="stats-overlay" id="stats-overlay">
+  <div class="stats-topbar">
+    <div class="topbar-icon" style="background:var(--green)">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </div>
+    <h2>Estatísticas</h2>
+    <div class="icon-btn" onclick="closeStats()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+
+  <div class="stats-body">
+    <!-- TABS -->
+    <div class="stat-tab-bar">
+      <div class="stat-tab active" id="tab-global" onclick="switchStatTab('global')">Global</div>
+      <div class="stat-tab" id="tab-estagio" onclick="switchStatTab('estagio')">Por Estágio</div>
+      <div class="stat-tab" id="tab-tempo" onclick="switchStatTab('tempo')">Evolução</div>
+    </div>
+
+    <!-- TAB: GLOBAL -->
+    <div class="stat-section show" id="sec-global">
+      <div class="kpi-grid" id="kpi-global"></div>
+      <div class="stat-card" id="chart-tecnica"></div>
+      <div class="stat-card" id="chart-asa"></div>
+      <div class="stat-card" id="chart-autonomia-global"></div>
+      <div class="stat-card" id="chart-complicacoes"></div>
+    </div>
+
+    <!-- TAB: POR ESTÁGIO -->
+    <div class="stat-section" id="sec-estagio">
+      <div class="filter-bar" id="filter-estagios"></div>
+      <div id="estagio-detail"></div>
+    </div>
+
+    <!-- TAB: EVOLUÇÃO -->
+    <div class="stat-section" id="sec-tempo">
+      <div class="stat-card" id="chart-timeline"></div>
+      <div class="stat-card" id="chart-autonomia-evolucao"></div>
+    </div>
+  </div>
+</div>
+
+<div class="settings-overlay" id="settings-overlay" onclick="closeSettings(event)">
   <div class="settings-panel">
     <div class="settings-handle"></div><h3>Configurações</h3>
     <label>Chave API do Claude</label><input type="password" id="set-api-key" placeholder="sk-ant-..." oninput="saveSettings()">
@@ -1133,6 +1230,309 @@ function exportToExcel() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+// ─── STATS ENGINE ─────────────────────────────────────────────────────────────
+var currentStatTab = 'global';
+var currentEstagioFilter = null;
+
+function openStats() {
+  document.getElementById('stats-overlay').classList.add('show');
+  document.getElementById('stats-btn').classList.add('stats-active');
+  renderStats();
+}
+
+function closeStats() {
+  document.getElementById('stats-overlay').classList.remove('show');
+  document.getElementById('stats-btn').classList.remove('stats-active');
+}
+
+function switchStatTab(tab) {
+  currentStatTab = tab;
+  document.querySelectorAll('.stat-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.stat-section').forEach(function(s){ s.classList.remove('show'); });
+  document.getElementById('sec-' + tab).classList.add('show');
+}
+
+function getRecords() {
+  try { return JSON.parse(localStorage.getItem('casuistica') || '[]'); } catch(e) { return []; }
+}
+
+function count(arr, key) {
+  var m = {};
+  arr.forEach(function(r){ var v = r[key] || 'N/D'; if(!m[v]) m[v]=0; m[v]++; });
+  return m;
+}
+
+function topN(map, n) {
+  return Object.entries(map).sort(function(a,b){return b[1]-a[1];}).slice(0,n);
+}
+
+var PALETTE = ['#185FA5','#0F6E56','#534AB7','#A32D2D','#639922','#378ADD','#3C3489','#27500A','#0C447C','#6b3fa0'];
+var AUTONOMY_COLORS = { 'Autónomo': '#0F6E56', 'Com ajuda': '#378ADD', 'Feito por outro': '#A32D2D' };
+
+function renderBarChart(containerId, title, entries, color) {
+  var el = document.getElementById(containerId);
+  if (!entries.length) { el.innerHTML = '<div class="stat-card-header">' + title + '</div><div class="stat-empty">Sem dados</div>'; return; }
+  var max = entries[0][1];
+  var html = '<div class="stat-card-header">' + title + '</div>';
+  entries.forEach(function(e, i) {
+    var pct = max > 0 ? Math.round(e[1]/max*100) : 0;
+    var c = Array.isArray(color) ? color[i % color.length] : color;
+    html += '<div class="stat-bar-row"><span class="stat-bar-label" title="' + e[0] + '">' + e[0] + '</span><div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:' + pct + '%;background:' + c + '"></div></div><span class="stat-bar-val">' + e[1] + '</span></div>';
+  });
+  el.innerHTML = html;
+}
+
+function renderDonut(containerId, title, map, palette) {
+  var el = document.getElementById(containerId);
+  var entries = topN(map, 6);
+  var total = entries.reduce(function(s,e){return s+e[1];},0);
+  if (!total) { el.innerHTML = '<div class="stat-card-header">' + title + '</div><div class="stat-empty">Sem dados</div>'; return; }
+
+  // Build SVG donut
+  var r = 36, cx = 46, cy = 46, stroke = 22;
+  var circ = 2 * Math.PI * r;
+  var offset = 0;
+  var segments = '';
+  entries.forEach(function(e, i) {
+    var frac = e[1] / total;
+    var dash = frac * circ;
+    var gap = circ - dash;
+    var c = palette[i % palette.length];
+    segments += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + c + '" stroke-width="' + stroke + '" stroke-dasharray="' + dash.toFixed(2) + ' ' + gap.toFixed(2) + '" stroke-dashoffset="' + (-offset * circ / (2*Math.PI)).toFixed(2) + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"/>';
+    offset += frac * 2 * Math.PI;
+  });
+  var svgW = 92, svgH = 92;
+  var svg = '<svg width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '" class="timeline-svg">' + segments + '<text x="' + cx + '" y="' + (cy+1) + '" text-anchor="middle" dominant-baseline="middle" font-size="14" font-weight="700" fill="var(--text)">' + total + '</text><text x="' + cx + '" y="' + (cy+14) + '" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="var(--text-muted)">casos</text></svg>';
+
+  var legend = '<div class="donut-legend">';
+  entries.forEach(function(e, i) {
+    var pct = Math.round(e[1]/total*100);
+    legend += '<div class="donut-legend-item"><div class="donut-dot" style="background:' + palette[i%palette.length] + '"></div><span>' + e[0] + '</span><span class="donut-pct">' + pct + '%</span></div>';
+  });
+  legend += '</div>';
+
+  el.innerHTML = '<div class="stat-card-header">' + title + '</div><div class="donut-wrap">' + svg + legend + '</div>';
+}
+
+function renderAutonomiaGlobal(containerId, records) {
+  var el = document.getElementById(containerId);
+  // Collect all autonomy fields
+  var fields = ['autonomia_va','autonomia_neuroeixo','autonomia_bnp','autonomia_arterial','autonomia_cvc'];
+  var counts = { 'Autónomo': 0, 'Com ajuda': 0, 'Feito por outro': 0 };
+  var total = 0;
+  records.forEach(function(r) {
+    fields.forEach(function(f) {
+      var v = r[f] || '';
+      if (v.indexOf('Autónomo') !== -1) { counts['Autónomo']++; total++; }
+      else if (v.indexOf('Com ajuda') !== -1) { counts['Com ajuda']++; total++; }
+      else if (v.indexOf('Feito por outro') !== -1) { counts['Feito por outro']++; total++; }
+    });
+  });
+  if (!total) { el.innerHTML = '<div class="stat-card-header">Autonomia Global</div><div class="stat-empty">Sem dados de autonomia</div>'; return; }
+  var html = '<div class="stat-card-header">Autonomia Global (todas as técnicas)</div>';
+  html += '<div class="autonomy-stacked">';
+  Object.keys(counts).forEach(function(k) {
+    var w = total > 0 ? Math.round(counts[k]/total*100) : 0;
+    html += '<div class="autonomy-stacked-seg" style="width:' + w + '%;background:' + (AUTONOMY_COLORS[k]||'#ccc') + '"></div>';
+  });
+  html += '</div><div class="autonomy-legend">';
+  Object.keys(counts).forEach(function(k) {
+    var pct = total > 0 ? Math.round(counts[k]/total*100) : 0;
+    html += '<div class="autonomy-legend-item"><div class="donut-dot" style="background:' + (AUTONOMY_COLORS[k]||'#ccc') + '"></div>' + k + ' (' + pct + '%)</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderTimeline(records) {
+  var el = document.getElementById('chart-timeline');
+  if (!records.length) { el.innerHTML = '<div class="stat-card-header">Casos por Mês</div><div class="stat-empty">Sem dados</div>'; return; }
+  // last 12 months
+  var months = {};
+  var now = new Date();
+  for (var i = 11; i >= 0; i--) {
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    months[key] = 0;
+  }
+  records.forEach(function(r) {
+    if (r.data) {
+      var key = r.data.substring(0,7);
+      if (months[key] !== undefined) months[key]++;
+    }
+  });
+  var keys = Object.keys(months);
+  var vals = keys.map(function(k){return months[k];});
+  var maxV = Math.max.apply(null, vals) || 1;
+  var html = '<div class="stat-card-header">Casos por Mês (últimos 12 meses)</div><div class="month-bar-wrap"><div class="month-bars">';
+  keys.forEach(function(k, i) {
+    var v = vals[i];
+    var h = Math.round(v / maxV * 60);
+    var lbl = k.substring(5); // MM
+    var months_pt = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    var lbl2 = months_pt[parseInt(lbl)] || lbl;
+    html += '<div class="month-bar-col"><span class="month-bar-num">' + (v||'') + '</span><div class="month-bar" style="height:' + Math.max(h,2) + 'px"></div><span class="month-bar-lbl">' + lbl2 + '</span></div>';
+  });
+  html += '</div></div>';
+  el.innerHTML = html;
+}
+
+function renderAutonomiaEvolucao(records) {
+  var el = document.getElementById('chart-autonomia-evolucao');
+  // Group by month, calc autonomy ratio
+  var fields = ['autonomia_va','autonomia_neuroeixo','autonomia_bnp','autonomia_arterial','autonomia_cvc'];
+  var byMonth = {};
+  records.forEach(function(r) {
+    var key = (r.data || '').substring(0,7);
+    if (!key) return;
+    if (!byMonth[key]) byMonth[key] = { auto: 0, ajuda: 0, outro: 0 };
+    fields.forEach(function(f) {
+      var v = r[f] || '';
+      if (v.indexOf('Autónomo') !== -1) byMonth[key].auto++;
+      else if (v.indexOf('Com ajuda') !== -1) byMonth[key].ajuda++;
+      else if (v.indexOf('Feito por outro') !== -1) byMonth[key].outro++;
+    });
+  });
+  var keys = Object.keys(byMonth).sort().slice(-6);
+  if (!keys.length) { el.innerHTML = '<div class="stat-card-header">Evolução da Autonomia</div><div class="stat-empty">Sem dados de autonomia</div>'; return; }
+  var months_pt = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  var html = '<div class="stat-card-header">Evolução da Autonomia (últimos 6 meses)</div>';
+  keys.forEach(function(k) {
+    var d = byMonth[k];
+    var total = d.auto + d.ajuda + d.outro;
+    if (!total) return;
+    var lbl = months_pt[parseInt(k.substring(5))] + ' ' + k.substring(2,4);
+    html += '<div style="padding:6px 14px 0"><span style="font-size:11px;color:var(--text-muted)">' + lbl + '</span></div>';
+    html += '<div class="autonomy-stacked" style="margin:4px 14px 8px">';
+    [['auto','Autónomo'],['ajuda','Com ajuda'],['outro','Feito por outro']].forEach(function(pair) {
+      var w = Math.round(d[pair[0]]/total*100);
+      html += '<div class="autonomy-stacked-seg" style="width:' + w + '%;background:' + (AUTONOMY_COLORS[pair[1]]||'#ccc') + '"></div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="autonomy-legend" style="padding:0 14px 12px">';
+  [['Autónomo','#0F6E56'],['Com ajuda','#378ADD'],['Feito por outro','#A32D2D']].forEach(function(p){
+    html += '<div class="autonomy-legend-item"><div class="donut-dot" style="background:' + p[1] + '"></div>' + p[0] + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderEstagioDetail(records, estagio) {
+  var el = document.getElementById('estagio-detail');
+  var recs = estagio ? records.filter(function(r){return r.estagio === estagio;}) : records;
+  if (!recs.length) { el.innerHTML = '<div class="stat-empty">Sem registos para este estágio</div>'; return; }
+
+  var html = '';
+
+  // KPIs
+  var vad = recs.filter(function(r){return (r.vad_sim_nao||'').indexOf('Sim')!==-1;}).length;
+  var compl = recs.filter(function(r){return r.complicacoes && r.complicacoes.replace(/Nenhuma/gi,'').trim();}).length;
+  html += '<div class="kpi-grid">';
+  html += '<div class="kpi-card"><div class="kpi-num">' + recs.length + '</div><div class="kpi-label">Total de casos</div></div>';
+  html += '<div class="kpi-card red"><div class="kpi-num">' + vad + '</div><div class="kpi-label">VAD registadas</div></div>';
+  html += '</div>';
+
+  // Técnica
+  var tecMap = count(recs, 'tecnica_anest');
+  var tecEntries = topN(tecMap, 8);
+  html += '<div class="stat-card" id="ec-tec"></div>';
+  html += '<div class="stat-card" id="ec-proc"></div>';
+  html += '<div class="stat-card" id="ec-auto"></div>';
+
+  el.innerHTML = html;
+
+  renderBarChart('ec-tec', 'Técnica Anestésica', tecEntries, PALETTE);
+
+  // Top procedimentos
+  var procMap = {};
+  recs.forEach(function(r){
+    (r.procedimentos||'').split(' | ').forEach(function(p){ p = p.trim(); if(p){if(!procMap[p])procMap[p]=0;procMap[p]++;} });
+  });
+  renderBarChart('ec-proc', 'Procedimentos mais frequentes', topN(procMap, 8), '#378ADD');
+
+  // Autonomia
+  renderAutonomiaEloBox('ec-auto', recs);
+}
+
+function renderAutonomiaEloBox(id, recs) {
+  var el = document.getElementById(id);
+  var fields = ['autonomia_va','autonomia_neuroeixo','autonomia_bnp','autonomia_arterial','autonomia_cvc'];
+  var counts = { 'Autónomo': 0, 'Com ajuda': 0, 'Feito por outro': 0 };
+  var total = 0;
+  recs.forEach(function(r) {
+    fields.forEach(function(f) {
+      var v = r[f] || '';
+      if (v.indexOf('Autónomo') !== -1) { counts['Autónomo']++; total++; }
+      else if (v.indexOf('Com ajuda') !== -1) { counts['Com ajuda']++; total++; }
+      else if (v.indexOf('Feito por outro') !== -1) { counts['Feito por outro']++; total++; }
+    });
+  });
+  if (!total) { el.innerHTML = '<div class="stat-card-header">Autonomia</div><div class="stat-empty">Sem dados</div>'; return; }
+  var html = '<div class="stat-card-header">Autonomia neste estágio</div><div class="autonomy-stacked">';
+  Object.keys(counts).forEach(function(k) {
+    var w = Math.round(counts[k]/total*100);
+    html += '<div class="autonomy-stacked-seg" style="width:' + w + '%;background:' + (AUTONOMY_COLORS[k]||'#ccc') + '"></div>';
+  });
+  html += '</div><div class="autonomy-legend">';
+  Object.keys(counts).forEach(function(k) {
+    var pct = Math.round(counts[k]/total*100);
+    html += '<div class="autonomy-legend-item"><div class="donut-dot" style="background:' + (AUTONOMY_COLORS[k]||'#ccc') + '"></div>' + k + ' (' + pct + '%)</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderStats() {
+  var records = getRecords();
+
+  // ── GLOBAL TAB ──
+  var vad = records.filter(function(r){return (r.vad_sim_nao||'').indexOf('Sim')!==-1;}).length;
+  var compl = records.filter(function(r){return r.complicacoes && r.complicacoes.replace(/Nenhuma/gi,'').trim() !== '';}).length;
+  var estagios = Object.keys(count(records,'estagio')).length;
+  document.getElementById('kpi-global').innerHTML =
+    '<div class="kpi-card"><div class="kpi-num">' + records.length + '</div><div class="kpi-label">Total de casos</div></div>' +
+    '<div class="kpi-card green"><div class="kpi-num">' + estagios + '</div><div class="kpi-label">Estágios com registos</div></div>' +
+    '<div class="kpi-card red"><div class="kpi-num">' + vad + '</div><div class="kpi-label">VAD registadas</div></div>' +
+    '<div class="kpi-card purple"><div class="kpi-num">' + compl + '</div><div class="kpi-label">Com complicações</div></div>';
+
+  renderDonut('chart-tecnica', 'Técnica Anestésica', count(records,'tecnica_anest'), PALETTE);
+  renderDonut('chart-asa', 'Distribuição ASA', count(records,'asa'), ['#0F6E56','#378ADD','#185FA5','#534AB7','#A32D2D','#6b3fa0']);
+  renderAutonomiaGlobal('chart-autonomia-global', records);
+
+  // Complicações
+  var complMap = {};
+  records.forEach(function(r){
+    (r.complicacoes||'').split(' | ').forEach(function(c){ c = c.trim(); if(c && c.toLowerCase()!=='nenhuma'){if(!complMap[c])complMap[c]=0;complMap[c]++;} });
+  });
+  renderBarChart('chart-complicacoes', 'Complicações registadas', topN(complMap,8), '#A32D2D');
+
+  // ── ESTÁGIO TAB ──
+  var estagioMap = count(records,'estagio');
+  var filterBar = document.getElementById('filter-estagios');
+  var estagioList = topN(estagioMap, 20).map(function(e){return e[0];});
+  if (!currentEstagioFilter && estagioList.length) currentEstagioFilter = estagioList[0];
+  filterBar.innerHTML = estagioList.map(function(e){
+    return '<div class="filter-chip' + (e===currentEstagioFilter?' on':'') + '" onclick="selectEstagioFilter(\'' + e.replace(/'/g,"\\'") + '\')">' + e + ' <span style="opacity:0.6">(' + estagioMap[e] + ')</span></div>';
+  }).join('');
+  renderEstagioDetail(records, currentEstagioFilter);
+
+  // ── EVOLUÇÃO TAB ──
+  renderTimeline(records);
+  renderAutonomiaEvolucao(records);
+}
+
+function selectEstagioFilter(estagio) {
+  currentEstagioFilter = estagio;
+  var records = getRecords();
+  // update filter chips
+  document.querySelectorAll('#filter-estagios .filter-chip').forEach(function(c){
+    c.classList.toggle('on', c.textContent.trim().startsWith(estagio));
+  });
+  renderEstagioDetail(records, estagio);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
