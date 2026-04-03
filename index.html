@@ -393,18 +393,43 @@
       <div class="chip-wrap">
         <span class="sublabel">Abordagem</span>
         <div class="chips" id="chips-va">
-          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va-box', true)">IOT</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Nasotraqueal</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Submentoniana</div>
-          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va-box', true)">Máscara laríngea</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Máscara facial</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Sem abordagem</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Ligação ao ventilador</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Jet ventilation</div>
+          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">IOT</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">Nasotraqueal</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">Submentoniana</div>
+          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">Máscara laríngea</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">Máscara facial</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">Sem abordagem</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">Ligação ao ventilador</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true); checkTuboSize()">Jet ventilation</div>
         </div>
         <div class="autonomy-bar hidden" id="aut-va-box">
           <span class="sublabel">Autonomia (Via Aérea)</span>
           <div class="chips" id="chips-aut-va"><div class="chip" onclick="solo(this, 'chips-aut-va')">Autónomo</div><div class="chip" onclick="solo(this, 'chips-aut-va')">Com ajuda</div><div class="chip" onclick="solo(this, 'chips-aut-va')">Feito por outro</div></div>
+        </div>
+      </div>
+      <div class="chip-wrap hidden" id="tubo-size-wrap">
+        <span class="sublabel">Tubo Orotraqueal</span>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:2px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:13px; color:var(--text-muted)">Nº</span>
+            <input type="number" id="f-tubo-size" step="0.5" min="5" max="10" placeholder="7.5" style="width:72px; padding:6px 10px; border-radius:8px; border:0.5px solid var(--gray-border-strong); font-size:14px; background:var(--surface); color:var(--text); outline:none; text-align:center;">
+          </div>
+          <div class="chips" id="chips-tubo-tipo" style="margin-top:0">
+            <div class="chip" onclick="solo(this,'chips-tubo-tipo')">Com cuff</div>
+            <div class="chip" onclick="solo(this,'chips-tubo-tipo')">Sem cuff</div>
+            <div class="chip" onclick="solo(this,'chips-tubo-tipo')">Aramado</div>
+            <div class="chip" onclick="solo(this,'chips-tubo-tipo')">Pré-curvo</div>
+          </div>
+        </div>
+      </div>
+      <div class="chip-wrap" id="tentativas-wrap">
+        <span class="sublabel">Nº de tentativas de intubação</span>
+        <div class="chips" id="chips-tentativas">
+          <div class="chip on" onclick="solo(this,'chips-tentativas')">1</div>
+          <div class="chip" onclick="solo(this,'chips-tentativas')">2</div>
+          <div class="chip" onclick="solo(this,'chips-tentativas')">3</div>
+          <div class="chip" onclick="solo(this,'chips-tentativas')">4</div>
+          <div class="chip" onclick="solo(this,'chips-tentativas')">5</div>
         </div>
       </div>
       <div class="chip-wrap">
@@ -441,12 +466,16 @@
       <div class="card-header">Neuro-eixo</div>
       <div class="chip-wrap">
         <div class="chips" id="chips-cent">
-          <div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Subaracnoideu</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Epidural lombar</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Epidural torácica</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Sequencial</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Nenhuma</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false); autoNeuroVol(this)">Subaracnoideu</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false); autoNeuroVol(this)">Epidural lombar</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false); autoNeuroVol(this)">Epidural torácica</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false); autoNeuroVol(this)">Sequencial</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Nenhuma</div>
         </div>
         <div class="autonomy-bar hidden" id="aut-cent-box">
           <span class="sublabel">Autonomia (Neuro-eixo)</span>
           <div class="chips" id="chips-aut-cent"><div class="chip" onclick="solo(this, 'chips-aut-cent')">Autónomo</div><div class="chip" onclick="solo(this, 'chips-aut-cent')">Com ajuda</div><div class="chip" onclick="solo(this, 'chips-aut-cent')">Feito por outro</div></div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+            <span class="sublabel" style="margin:0; white-space:nowrap;">Volume AL (mL)</span>
+            <input type="number" id="f-vol-neuroeixo" step="0.5" min="0" placeholder="–" style="width:72px; padding:6px 10px; border-radius:8px; border:0.5px solid var(--gray-border-strong); font-size:14px; background:var(--surface); color:var(--text); outline:none; text-align:center;">
+          </div>
         </div>
       </div>
     </div>
@@ -455,10 +484,10 @@
       <div class="card-header">BNP periférico</div>
       <div class="chip-wrap">
         <div class="chips" id="chips-bnp">
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Axilar</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Supraclavicular</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Interescalénico</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Canal dos adutores</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Ciático popliteu</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Fascia ilíaca</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">PENG</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">TAP</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Femoral</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">CFL</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">ESPB</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Serrátil</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Nenhum</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Axilar</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Supraclavicular</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Interescalénico</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Canal dos adutores</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Ciático popliteu</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Fascia ilíaca</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">PENG</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">TAP</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Femoral</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">CFL</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">ESPB</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false); autoBNPVol(this)">Serrátil</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Nenhum</div>
         </div>
         
         <div class="autonomy-bar hidden" id="aut-bnp-box">
@@ -469,6 +498,10 @@
           <div class="bar-section">
             <span class="sublabel">Orientação</span>
             <div class="chips" id="chips-guia-bnp"><div class="chip" onclick="solo(this, 'chips-guia-bnp')">Ecoguiado</div><div class="chip" onclick="solo(this, 'chips-guia-bnp')">Neuroestimulação</div><div class="chip" onclick="solo(this, 'chips-guia-bnp')">Ref. anatómicas</div></div>
+          </div>
+          <div class="bar-section" style="display:flex; align-items:center; gap:8px;">
+            <span class="sublabel" style="margin:0; white-space:nowrap;">Volume AL (mL)</span>
+            <input type="number" id="f-vol-bnp" step="0.5" min="0" placeholder="–" style="width:72px; padding:6px 10px; border-radius:8px; border:0.5px solid var(--gray-border-strong); font-size:14px; background:var(--surface); color:var(--text); outline:none; text-align:center;">
           </div>
         </div>
       </div>
@@ -501,7 +534,33 @@
 
     <div class="card">
       <div class="card-header">Monitorização adicional</div>
-      <div class="chip-wrap"><div class="chips" id="chips-mon"><div class="chip" onclick="toggle(this)">BIS</div><div class="chip" onclick="toggle(this)">TOF</div><div class="chip" onclick="toggle(this)">PAI</div><div class="chip" onclick="toggle(this)">PVC</div><div class="chip" onclick="toggle(this)">Débito urinário</div><div class="chip" onclick="toggle(this)">Temp. central</div><div class="chip" onclick="toggle(this)">PIC</div><div class="chip" onclick="toggle(this)">Ecocardiografia</div><div class="chip" onclick="toggle(this)">NIRS</div><div class="chip" onclick="toggle(this)">Nenhuma</div></div></div>
+      <div class="chip-wrap">
+        <div class="chips" id="chips-mon">
+          <div class="chip" onclick="toggle(this)">BIS</div>
+          <div class="chip" onclick="toggle(this)">TOF</div>
+          <div class="chip" onclick="toggle(this)">PAI</div>
+          <div class="chip" onclick="toggle(this)">PVC</div>
+          <div class="chip" onclick="toggle(this)">Débito urinário</div>
+          <div class="chip" onclick="toggle(this)">Temp. central</div>
+          <div class="chip" onclick="toggle(this)">PIC</div>
+          <div class="chip" onclick="toggle(this)">Ecocardiografia</div>
+          <div class="chip" onclick="toggle(this)">NIRS</div>
+          <div class="chip" onclick="checkAutonomy(this, 'dc-box', false)">Débito cardíaco</div>
+          <div class="chip" onclick="toggle(this)">PCWP (encravamento pulmonar)</div>
+          <div class="chip" onclick="toggle(this)">Nenhuma</div>
+        </div>
+        <div class="autonomy-bar hidden" id="dc-box">
+          <span class="sublabel">Método de medição do DC</span>
+          <div class="chips" id="chips-dc-metodo">
+            <div class="chip" onclick="toggle(this)">Termodiluição (Swan-Ganz)</div>
+            <div class="chip" onclick="toggle(this)">Termodiluição transpulmonar (PiCCO)</div>
+            <div class="chip" onclick="toggle(this)">Análise contorno de pulso (FloTrac)</div>
+            <div class="chip" onclick="toggle(this)">Impedância torácica</div>
+            <div class="chip" onclick="toggle(this)">Doppler esofágico</div>
+            <div class="chip" onclick="toggle(this)">Ecocardiografia (LVOT-VTI)</div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div class="card">
@@ -525,7 +584,14 @@
       <div class="chip-wrap">
         <span class="sublabel">CVC / outros</span>
         <div class="chips" id="chips-cvc">
-          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Jugular interno</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Subclávia</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Femoral</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">CVCTI</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">DVE</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Jugular interno</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Subclávia</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Femoral</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">CVCTI</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Bainha introdutora</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Swan-Ganz</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Cateter de diálise (Mahurkar)</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">DVE</div>
         </div>
         <div class="autonomy-bar hidden" id="aut-cvc-box">
           <div class="bar-section">
@@ -889,6 +955,62 @@ function setTecnica(el) {
   clearDrugs(); updateFarms();
 }
 
+// ─── LOGIC: TUBO SIZE ─────────────────────────────────────────────────────────
+function checkTuboSize() {
+  var chips = document.getElementById('chips-va').querySelectorAll('.chip');
+  var selected = Array.from(chips).find(function(c){ return c.classList.contains('on'); });
+  var wrap = document.getElementById('tubo-size-wrap');
+  var tentWrap = document.getElementById('tentativas-wrap');
+  if (selected && (selected.textContent === 'IOT' || selected.textContent === 'Nasotraqueal' || selected.textContent === 'Submentoniana')) {
+    wrap.classList.remove('hidden');
+    tentWrap.style.display = '';
+  } else {
+    wrap.classList.add('hidden');
+    tentWrap.style.display = 'none';
+  }
+}
+
+// ─── LOGIC: VOLUME AL AUTO-FILL ───────────────────────────────────────────────
+var BNP_VOLS = {
+  'Axilar': 30, 'Supraclavicular': 20, 'Interescalénico': 15,
+  'Canal dos adutores': 15, 'Ciático popliteu': 15, 'Fascia ilíaca': 30,
+  'PENG': 20, 'TAP': 20, 'Femoral': 15,
+  'CFL': 10, 'ESPB': 20, 'Serrátil': 20
+};
+
+var NEURO_VOLS = {
+  'Subaracnoideu': 2.5, 'Epidural lombar': 15, 'Epidural torácica': 10, 'Sequencial': 2.5
+};
+
+function autoBNPVol(el) {
+  // Only set if chip is being turned ON and field is empty or was auto-filled
+  setTimeout(function() {
+    var anyOn = Array.from(document.getElementById('chips-bnp').querySelectorAll('.chip'))
+      .filter(function(c){ return c.classList.contains('on'); });
+    if (!anyOn.length) return;
+    var lastName = anyOn[anyOn.length - 1].textContent.trim();
+    var vol = BNP_VOLS[lastName];
+    if (vol !== undefined) {
+      document.getElementById('f-vol-bnp').value = vol;
+      document.getElementById('f-vol-bnp').style.color = 'var(--blue)';
+    }
+  }, 50);
+}
+
+function autoNeuroVol(el) {
+  setTimeout(function() {
+    var anyOn = Array.from(document.getElementById('chips-cent').querySelectorAll('.chip'))
+      .filter(function(c){ return c.classList.contains('on'); });
+    if (!anyOn.length) return;
+    var name = anyOn[0].textContent.trim();
+    var vol = NEURO_VOLS[name];
+    if (vol !== undefined) {
+      document.getElementById('f-vol-neuroeixo').value = vol;
+      document.getElementById('f-vol-neuroeixo').style.color = 'var(--blue)';
+    }
+  }, 50);
+}
+
 // ─── LOGIC: VAD ───────────────────────────────────────────────────────────────
 function setVAD(sim) {
   var chips = document.getElementById('chips-vad-simnao').querySelectorAll('.chip');
@@ -1130,19 +1252,25 @@ function collectData() {
     abord_va: getChips('chips-va'),
     metodo_va: getChips('chips-va2'),
     autonomia_va: getChips('chips-aut-va'),
+    tubo_ot_tamanho: document.getElementById('f-tubo-size').value,
+    tubo_ot_tipo: getChips('chips-tubo-tipo'),
+    tentativas_intubacao: getChips('chips-tentativas'),
     vad_sim_nao: getChips('chips-vad-simnao'),
     vad_criterios: getChips('chips-vad-crit'),
     
     neuroeixo: getChips('chips-cent'),
     autonomia_neuroeixo: getChips('chips-aut-cent'),
+    vol_al_neuroeixo: document.getElementById('f-vol-neuroeixo').value,
     bnp: getChips('chips-bnp'),
     autonomia_bnp: getChips('chips-aut-bnp'),
     orientacao_bnp: getChips('chips-guia-bnp'),
+    vol_al_bnp: document.getElementById('f-vol-bnp').value,
     al_farmaco: getChips('chips-al-farmaco'),
     al_concentracao: getChips('chips-al-conc'),
     al_adjuvantes: getChips('chips-al-adjuv'),
     
     monitorizacao: getChips('chips-mon'),
+    dc_metodo: getChips('chips-dc-metodo'),
     acesso_arterial: getChips('chips-art'),
     metodo_arterial: getChips('chips-metodo-art'),
     autonomia_arterial: getChips('chips-aut-art'),
@@ -1184,7 +1312,7 @@ function newRecord() {
   selectedProcs = []; aiProcs = []; imageBase64 = null; renderSelected();
   document.getElementById('proc-lists').innerHTML = '';
   document.getElementById('f-data').value = today;
-  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc','f-uces-num'].forEach(function(id){document.getElementById(id).value='';});
+  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc','f-uces-num','f-tubo-size','f-vol-neuroeixo','f-vol-bnp'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('f-asa').selectedIndex = 1; document.getElementById('f-posicao').selectedIndex = 0;
   
   document.getElementById('preview-img').style.display = 'none'; document.getElementById('scan-btn').style.display = 'none';
@@ -1194,7 +1322,14 @@ function newRecord() {
   document.querySelectorAll('.chip.on').forEach(function(c){ c.classList.remove('on','ai-filled'); });
   document.querySelectorAll('.ai-hl').forEach(function(r){ r.classList.remove('ai-hl'); });
   document.querySelectorAll('.autonomy-bar').forEach(function(b){ b.classList.add('hidden'); });
-  
+  document.getElementById('tubo-size-wrap').classList.add('hidden');
+  document.getElementById('tentativas-wrap').style.display = 'none';
+  document.getElementById('dc-box').classList.add('hidden');
+
+  // Re-default tentativas to 1
+  var tentChips = document.getElementById('chips-tentativas').querySelectorAll('.chip');
+  tentChips[0].classList.add('on');
+
   setVAD(false); updateFarms(); checkExclusaoPulmonar(); goTo(0);
 }
 
@@ -1536,7 +1671,11 @@ function selectEstagioFilter(estagio) {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-var today = new Date().toISOString().split('T')[0]; document.getElementById('f-data').value = today; loadSettings();
+var today = new Date().toISOString().split('T')[0];
+document.getElementById('f-data').value = today;
+document.getElementById('tentativas-wrap').style.display = 'none';
+document.getElementById('chips-tentativas').querySelectorAll('.chip')[0].classList.add('on');
+loadSettings();
 </script>
 
 <script>
