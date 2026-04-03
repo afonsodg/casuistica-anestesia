@@ -205,6 +205,53 @@
   .month-bar { width: 100%; background: var(--blue-light); border: 0.5px solid var(--blue-mid); border-radius: 3px 3px 0 0; transition: height 0.5s ease; min-height: 2px; }
   .month-bar-lbl { font-size: 9px; color: var(--text-faint); text-align: center; }
   .month-bar-num { font-size: 9px; color: var(--blue-dark); font-weight: 600; }
+
+  /* ── HISTÓRICO OVERLAY ─────────────────────────────────────── */
+  .hist-overlay { display: none; position: fixed; inset: 0; z-index: 160; background: var(--gray-bg); overflow: hidden; flex-direction: column; padding-top: var(--safe-top); }
+  .hist-overlay.show { display: flex; }
+  .hist-topbar { background: var(--surface); border-bottom: 0.5px solid var(--gray-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .hist-topbar h2 { font-size: 17px; font-weight: 600; flex: 1; }
+  .hist-search-wrap { padding: 10px 16px; background: var(--surface); border-bottom: 0.5px solid var(--gray-border); flex-shrink: 0; }
+  .hist-search-box { display: flex; align-items: center; gap: 8px; background: var(--gray-bg); border: 0.5px solid var(--gray-border-strong); border-radius: 10px; padding: 8px 12px; }
+  .hist-search-box svg { width: 15px; height: 15px; stroke: var(--text-faint); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+  .hist-search-box input { flex: 1; border: none; background: transparent; font-size: 14px; color: var(--text); outline: none; font-family: inherit; }
+  .hist-search-box input::placeholder { color: var(--text-faint); }
+  .hist-count { font-size: 11px; color: var(--text-faint); margin-top: 6px; padding: 0 2px; }
+  .hist-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 16px 20px; }
+  .hist-empty { text-align: center; color: var(--text-faint); font-size: 14px; padding: 60px 20px; }
+
+  .hist-item { background: var(--surface); border: 0.5px solid var(--gray-border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: flex; align-items: stretch; }
+  .hist-item-body { flex: 1; padding: 12px 14px; cursor: pointer; min-width: 0; }
+  .hist-item-body:active { background: var(--gray-bg); }
+  .hist-item-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .hist-num { font-size: 11px; font-weight: 700; color: var(--blue); background: var(--blue-light); border-radius: 6px; padding: 2px 7px; flex-shrink: 0; }
+  .hist-date { font-size: 11px; color: var(--text-faint); }
+  .hist-estagio { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; flex-shrink: 0; }
+  .hist-diag { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+  .hist-proc { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hist-meta { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
+  .hist-tag { font-size: 10px; color: var(--text-faint); background: var(--gray-bg); border: 0.5px solid var(--gray-border); border-radius: 5px; padding: 2px 6px; }
+  .hist-del-btn { width: 48px; display: flex; align-items: center; justify-content: center; background: var(--red-light); border-left: 0.5px solid var(--gray-border); cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
+  .hist-del-btn:active { background: #f5c5c5; }
+  .hist-del-btn svg { width: 16px; height: 16px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; }
+
+  /* ── CASE DETAIL OVERLAY ───────────────────────────────────── */
+  .case-overlay { display: none; position: fixed; inset: 0; z-index: 170; background: var(--gray-bg); overflow: hidden; flex-direction: column; padding-top: var(--safe-top); }
+  .case-overlay.show { display: flex; }
+  .case-topbar { background: var(--surface); border-bottom: 0.5px solid var(--gray-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .case-topbar h2 { font-size: 16px; font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .case-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 16px 30px; }
+  .case-section { background: var(--surface); border: 0.5px solid var(--gray-border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .case-section-hdr { padding: 7px 14px; border-bottom: 0.5px solid var(--gray-border); font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; background: var(--gray-bg); }
+  .case-row { display: flex; padding: 9px 14px; border-bottom: 0.5px solid var(--gray-border); gap: 8px; }
+  .case-row:last-child { border-bottom: none; }
+  .case-row-label { font-size: 12px; color: var(--text-muted); min-width: 120px; flex-shrink: 0; }
+  .case-row-value { font-size: 13px; color: var(--text); flex: 1; font-weight: 500; }
+  .case-del-btn { width: 100%; padding: 14px; background: var(--red-light); border: 0.5px solid rgba(163,45,45,0.3); border-radius: 12px; color: var(--red); font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+  .case-del-btn svg { width: 16px; height: 16px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; }
+  .case-del-btn:active { opacity: 0.7; }
+  .highlight { background: #fff3a3; border-radius: 2px; }
+  @media (prefers-color-scheme: dark) { .highlight { background: #5a4a00; } }
 </style>
 </head>
 <body>
@@ -219,6 +266,9 @@
       <p>Internato Anestesiologia · ULS Santa Maria</p>
     </div>
     <div class="topbar-actions">
+      <div class="icon-btn" id="hist-btn" onclick="openHist()" title="Histórico de casos">
+        <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+      </div>
       <div class="icon-btn" id="stats-btn" onclick="openStats()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       </div>
@@ -297,6 +347,19 @@
         <div class="legend"><div class="legend-dot" style="background:var(--blue)"></div><span>frequente</span><div class="legend-dot" style="background:var(--green-light);border:0.5px solid var(--green-mid)"></div><span>preenchido por IA</span></div>
         <div id="proc-lists"></div>
         <div class="custom-row"><input type="text" id="custom-proc" placeholder="Escrever procedimento..."><button onclick="addCustomProc()">+ Adicionar</button></div>
+      </div>
+    </div>
+
+    <div class="card" id="diag-card">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Diagnóstico</span>
+        <span id="diag-ai-badge" style="display:none" class="ai-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Inferido</span>
+      </div>
+      <div style="padding:8px 14px 4px">
+        <div id="diag-suggestions" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:0"></div>
+      </div>
+      <div class="field-row" style="border-top:0.5px solid var(--gray-border)">
+        <input type="text" id="f-diagnostico" placeholder="Confirmar ou escrever diagnóstico..." style="flex:1;text-align:left;font-size:14px;">
       </div>
     </div>
     <div class="btn-bar"><button class="btn" onclick="goTo(0)" style="flex:0.45">← Scan</button><button class="btn btn-primary" onclick="goTo(2)">Continuar →</button></div>
@@ -685,6 +748,39 @@
   </div>
 
   </div></div>
+
+<!-- HISTÓRICO OVERLAY -->
+<div class="hist-overlay" id="hist-overlay">
+  <div class="hist-topbar">
+    <div class="topbar-icon" style="background:var(--blue-dark)">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+    </div>
+    <h2>Histórico de Casos</h2>
+    <div class="icon-btn" onclick="closeHist()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="hist-search-wrap">
+    <div class="hist-search-box">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="hist-search-input" placeholder="Pesquisar por cirurgia, diagnóstico, estágio…" oninput="renderHistList()" autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="hist-count" id="hist-count"></div>
+  </div>
+  <div class="hist-list" id="hist-list"></div>
+</div>
+
+<!-- CASE DETAIL OVERLAY -->
+<div class="case-overlay" id="case-overlay">
+  <div class="case-topbar">
+    <div class="icon-btn" onclick="closeCaseDetail()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <h2 id="case-title">Caso</h2>
+    <div style="width:32px;flex-shrink:0"></div>
+  </div>
+  <div class="case-body" id="case-body"></div>
+</div>
 
 <!-- STATS OVERLAY -->
 <div class="stats-overlay" id="stats-overlay">
@@ -1110,8 +1206,245 @@ function onEstagioChange() {
   });
   checkExclusaoPulmonar();
 }
-function addProc(name, fromAI) { if (selectedProcs.indexOf(name) === -1) { selectedProcs.push(name); if (fromAI) aiProcs.push(name); renderSelected(); checkExclusaoPulmonar(); } }
-function removeProc(name) { selectedProcs = selectedProcs.filter(function(p){ return p !== name; }); aiProcs = aiProcs.filter(function(p){ return p !== name; }); renderSelected(); checkExclusaoPulmonar(); }
+function addProc(name, fromAI) { if (selectedProcs.indexOf(name) === -1) { selectedProcs.push(name); if (fromAI) aiProcs.push(name); renderSelected(); checkExclusaoPulmonar(); inferDiagnosis(); } }
+function removeProc(name) { selectedProcs = selectedProcs.filter(function(p){ return p !== name; }); aiProcs = aiProcs.filter(function(p){ return p !== name; }); renderSelected(); checkExclusaoPulmonar(); inferDiagnosis(); }
+
+// ─── DIAGNÓSTICO: BASE DE INFERÊNCIA ─────────────────────────────────────────
+var DIAG_MAP = [
+  // Colorrectal
+  { match: /hemicolectomia|sigmoidectomia|colectomia/i,           diag: 'Neoplasia do cólon' },
+  { match: /resseção anterior do reto|RAR|hartmann/i,             diag: 'Neoplasia do reto' },
+  { match: /apendicectomia/i,                                     diag: 'Apendicite aguda' },
+  { match: /hemorroidectomia/i,                                   diag: 'Doença hemorroidária' },
+  { match: /fístula perianal|abcesso perianal/i,                  diag: 'Fístula / abcesso perianal' },
+  { match: /quisto pilonidal|pilonidal/i,                         diag: 'Quisto pilonidal' },
+  { match: /proctocolectomia/i,                                   diag: 'Doença inflamatória intestinal' },
+
+  // HBP
+  { match: /colecistectomia/i,                                    diag: 'Colelitíase / Colecistite' },
+  { match: /whipple|duodenopancreatectomia/i,                    diag: 'Neoplasia da cabeça do pâncreas' },
+  { match: /pancreatectomia distal/i,                             diag: 'Neoplasia do corpo/cauda do pâncreas' },
+  { match: /hepatectomia/i,                                       diag: 'Neoplasia hepática (primária ou metástases)' },
+  { match: /splenectomia/i,                                       diag: 'Neoplasia / Hipertensão portal / Trauma' },
+  { match: /ablação.*hepático|ablação tumoral/i,                  diag: 'Metástases hepáticas' },
+
+  // Esófago-gástrico
+  { match: /esofagectomia|ivor lewis/i,                           diag: 'Neoplasia do esófago' },
+  { match: /gastrectomia total/i,                                 diag: 'Neoplasia gástrica' },
+  { match: /gastrectomia subtotal/i,                              diag: 'Neoplasia gástrica' },
+  { match: /sleeve gástrico/i,                                    diag: 'Obesidade mórbida' },
+  { match: /bypass gástrico|y-de-roux/i,                         diag: 'Obesidade mórbida' },
+  { match: /banda gástrica/i,                                     diag: 'Obesidade mórbida' },
+  { match: /duodenal switch/i,                                    diag: 'Obesidade mórbida supermórbida' },
+  { match: /fundoplicatura/i,                                     diag: 'Doença de refluxo gastroesofágico (DRGE)' },
+
+  // Mama e parede
+  { match: /mastectomia radical/i,                                diag: 'Neoplasia da mama' },
+  { match: /mastectomia simples|tumorectomia.*mama|quadrantectomia/i, diag: 'Neoplasia da mama' },
+  { match: /hernioplastia inguinal/i,                             diag: 'Hérnia inguinal' },
+  { match: /hernioplastia incisional/i,                           diag: 'Hérnia incisional' },
+  { match: /hernioplastia umbilical/i,                            diag: 'Hérnia umbilical' },
+  { match: /hernioplastia epigástrica/i,                          diag: 'Hérnia epigástrica' },
+  { match: /TAPP|TEP/i,                                           diag: 'Hérnia inguinal (laparoscopia)' },
+  { match: /quisto sebáceo|quisto epidermoide|lipoma/i,           diag: 'Quisto sebáceo / Lipoma' },
+
+  // Endócrino
+  { match: /tiroidectomia total/i,                                diag: 'Neoplasia da tiróide / Bócio multinodular' },
+  { match: /tiroidectomia parcial|hemitiroidectomia/i,            diag: 'Nódulo tiroideu / Bócio uninodular' },
+  { match: /paratiroidectomia/i,                                  diag: 'Hiperparatiroidismo' },
+  { match: /adrenalectomia/i,                                     diag: 'Neoplasia suprarrenal / Feocromocitoma' },
+
+  // Varizes
+  { match: /safenectomia|flebectomia|EVLA|RFA.*variz|escleroterapia/i, diag: 'Insuficiência venosa crónica / Varizes' },
+
+  // CVC
+  { match: /CVC implantado|câmara implantável/i,                  diag: 'Necessidade de acesso venoso central para quimioterapia' },
+
+  // Urologia
+  { match: /RTU-P/i,                                              diag: 'HBP / Neoplasia da próstata' },
+  { match: /prostatectomia radical/i,                             diag: 'Neoplasia da próstata' },
+  { match: /cistoprostatectomia|cistectomia/i,                    diag: 'Neoplasia da bexiga' },
+  { match: /RTU-V/i,                                              diag: 'Neoplasia da bexiga (suspeita/seguimento)' },
+  { match: /cistoscopia/i,                                        diag: 'Hematúria / Seguimento de neoplasia vesical' },
+  { match: /nefrectomia total/i,                                  diag: 'Neoplasia do rim' },
+  { match: /nefrectomia parcial/i,                                diag: 'Neoplasia do rim (pequena)' },
+  { match: /nefroureterectomia/i,                                 diag: 'Neoplasia do urotelio superior' },
+  { match: /URS|RIRS/i,                                           diag: 'Litíase ureteral / Renal' },
+  { match: /duplo J/i,                                            diag: 'Litíase / Obstrução ureteral' },
+  { match: /orquidectomia/i,                                      diag: 'Neoplasia testicular' },
+  { match: /orquidopexia/i,                                       diag: 'Criptorquidia' },
+
+  // Ginecologia
+  { match: /histerectomia total.*OSB|histerectomia.*laparoscopia|histerectomia.*laparotomia|histerectomia.*robótico/i, diag: 'Neoplasia do endométrio / Miomatose uterina' },
+  { match: /histerectomia vaginal/i,                              diag: 'Prolapso génito-urinário / Miomatose' },
+  { match: /miomectomia/i,                                        diag: 'Miomatose uterina' },
+  { match: /quistectomia ovárica/i,                               diag: 'Quisto ovárico' },
+  { match: /salpingectomia.*ectópica|gravidez ectópica/i,         diag: 'Gravidez ectópica' },
+  { match: /salpingectomia/i,                                     diag: 'Patologia tubária / Esterilização' },
+  { match: /laparoscopia.*estadiamento/i,                         diag: 'Neoplasia ginecológica (estadiamento)' },
+  { match: /punção ovárica/i,                                     diag: 'Infertilidade (PMA)' },
+  { match: /histeroscopia/i,                                      diag: 'Patologia endometrial / Pólipos' },
+  { match: /linfadenectomia pélvica/i,                            diag: 'Neoplasia ginecológica' },
+  { match: /debulking/i,                                          diag: 'Neoplasia ovárica' },
+
+  // Obstetrícia
+  { match: /cesariana eletiva/i,                                  diag: 'Gravidez de termo – cesariana eletiva' },
+  { match: /cesariana urgente/i,                                  diag: 'Sofrimento fetal agudo / Indicação obstétrica urgente' },
+  { match: /parto vaginal/i,                                      diag: 'Trabalho de parto' },
+  { match: /hemorragia pós-parto/i,                               diag: 'Hemorragia pós-parto' },
+  { match: /revisão uterina|curetagem/i,                          diag: 'Retenção placentária / Aborto' },
+  { match: /cerclagem/i,                                          diag: 'Incompetência colo uterino' },
+
+  // Ortopedia
+  { match: /PTA|prótese total da anca/i,                          diag: 'Coxartrose' },
+  { match: /PTJ|prótese total do joelho/i,                        diag: 'Gonartrose' },
+  { match: /PTO|prótese total do ombro/i,                         diag: 'Omartrose' },
+  { match: /hemiartroplastia da anca/i,                           diag: 'Fratura do colo do fémur' },
+  { match: /artroscopia.*joelho.*LCA|reconstrução LCA/i,          diag: 'Rotura do LCA' },
+  { match: /artroscopia.*joelho.*meniscectomia/i,                 diag: 'Lesão meniscal' },
+  { match: /artroscopia.*ombro.*manguito/i,                       diag: 'Rotura do manguito rotador' },
+  { match: /artrodese lombar|laminectomia lombar|discectomia lombar/i, diag: 'Estenose lombar / Hérnia discal lombar' },
+  { match: /artrodese cervical|discectomia cervical/i,            diag: 'Hérnia discal cervical / Estenose cervical' },
+  { match: /RO de fratura do fémur/i,                             diag: 'Fratura do fémur' },
+  { match: /RO de fratura/i,                                      diag: 'Fratura traumática' },
+  { match: /EMOS/i,                                               diag: 'Trauma / Fratura' },
+  { match: /ressecção tumoral óssea/i,                            diag: 'Neoplasia óssea' },
+
+  // ORL
+  { match: /amigdalectomia/i,                                     diag: 'Amigdalite crónica / SAOS' },
+  { match: /laringectomia total/i,                                 diag: 'Neoplasia da laringe' },
+  { match: /microcirurgia laríngea/i,                             diag: 'Lesão das cordas vocais / Neoplasia glótica' },
+  { match: /FESS|cirurgia endoscópica dos seios/i,                diag: 'Rinossinusite crónica / Polipose nasal' },
+  { match: /septoplastia/i,                                       diag: 'Desvio do septo nasal' },
+  { match: /implante coclear/i,                                   diag: 'Surdez neurossensorial' },
+  { match: /timpanoplastia/i,                                     diag: 'Otite média crónica / Colesteatoma' },
+  { match: /esvaziamento cervical/i,                              diag: 'Neoplasia da cabeça e pescoço' },
+  { match: /traqueostomia/i,                                      diag: 'Obstrução via aérea / Dependência ventilatória' },
+  { match: /drenagem.*abcesso periamigdalino/i,                   diag: 'Abcesso periamigdalino' },
+
+  // Cardíaca
+  { match: /CABG|bypass coronário/i,                              diag: 'Doença coronária multivaso' },
+  { match: /substituição valvular aórtica/i,                      diag: 'Estenose aórtica grave' },
+  { match: /substituição valvular mitral|reparação valvular mitral/i, diag: 'Doença valvular mitral' },
+  { match: /TAVI/i,                                               diag: 'Estenose aórtica grave (alto risco cirúrgico)' },
+  { match: /transplante cardíaco/i,                               diag: 'Insuficiência cardíaca terminal' },
+  { match: /pericardiotomia|janela pericárdica/i,                 diag: 'Derrame pericárdico / Tamponamento' },
+
+  // Torácica
+  { match: /lobectomia/i,                                         diag: 'Neoplasia do pulmão' },
+  { match: /pneumonectomia/i,                                     diag: 'Neoplasia do pulmão' },
+  { match: /segmentectomia pulmonar/i,                            diag: 'Neoplasia pulmonar / Metástase' },
+  { match: /pleurectomia|decorticação/i,                          diag: 'Empiema pleural / Mesotelioma' },
+  { match: /talcagem|pleurodese/i,                                diag: 'Derrame pleural recorrente / Pneumotórax' },
+  { match: /mediastinoscopia/i,                                   diag: 'Neoplasia mediastínica (estadiamento)' },
+  { match: /timectomia/i,                                         diag: 'Timoma / Miastenia gravis' },
+
+  // Vascular
+  { match: /EVAR/i,                                               diag: 'Aneurisma da aorta abdominal' },
+  { match: /TEVAR/i,                                              diag: 'Aneurisma / Disseção da aorta torácica' },
+  { match: /bypass.*femoro|bypass.*aorto/i,                       diag: 'Doença arterial periférica oclusiva' },
+  { match: /endarterectomia carotídea/i,                          diag: 'Estenose carotídea' },
+  { match: /amputação/i,                                          diag: 'Isquemia crítica de membro / Diabetes' },
+  { match: /fístula AV.*hemodiálise/i,                            diag: 'Insuficiência renal crónica (HD)' },
+  { match: /tromboembolectomia/i,                                 diag: 'Isquemia aguda de membro' },
+
+  // Neurocirurgia
+  { match: /craniotomia.*supratentorial/i,                        diag: 'Neoplasia cerebral supratentorial' },
+  { match: /craniotomia.*infratentorial/i,                        diag: 'Neoplasia cerebral infratentorial' },
+  { match: /clipagem de aneurisma/i,                              diag: 'Aneurisma cerebral / HSA' },
+  { match: /craniectomia descompressiva/i,                        diag: 'HIC refratária / AVC maligno' },
+  { match: /hematoma subdural/i,                                  diag: 'Hematoma subdural' },
+  { match: /hipófise|transesfenoidal/i,                           diag: 'Adenoma hipofisário' },
+  { match: /DVE|derivação ventricular/i,                          diag: 'Hidrocefalia / HIC' },
+  { match: /artrodese.*lombar|laminectomia.*lombar.*neuro/i,      diag: 'Estenose do canal lombar / Hérnia discal' },
+
+  // Cirurgia Plástica
+  { match: /retalho livre|microcirurgia/i,                        diag: 'Reconstrução pós-oncológica / Trauma' },
+  { match: /reconstrução mamária/i,                               diag: 'Neoplasia da mama (pós-mastectomia)' },
+  { match: /blefaroplastia/i,                                     diag: 'Ptose palpebral / Dermatocálase' },
+  { match: /rinoplastia/i,                                        diag: 'Deformidade nasal' },
+  { match: /abdominoplastia/i,                                    diag: 'Excesso de pele abdominal / Pós-bariátrica' },
+  { match: /lipoaspiração/i,                                      diag: 'Lipodistrofia localizada' },
+  { match: /tenorrafia/i,                                         diag: 'Lesão tendinosa (trauma)' },
+  { match: /RO de fratura.*metacarpo|RO.*falange/i,               diag: 'Fratura da mão (trauma)' },
+  { match: /RO de fratura.*maxilar|Le Fort/i,                     diag: 'Trauma facial' },
+
+  // Oftalmologia
+  { match: /facoemulsificação/i,                                  diag: 'Catarata' },
+  { match: /trabeculectomia|válvula.*Ahmed/i,                     diag: 'Glaucoma' },
+  { match: /vitrectomia/i,                                        diag: 'Descolamento da retina / Patologia vítrea' },
+  { match: /cerclagem escleral/i,                                 diag: 'Descolamento da retina' },
+  { match: /estrabismo/i,                                         diag: 'Estrabismo' },
+  { match: /enucleação|evisceração/i,                             diag: 'Neoplasia ocular / Olho cego doloroso' },
+  { match: /dacriocistorrinostomia/i,                             diag: 'Obstrução do canal lacrimal' },
+
+  // Pediatria
+  { match: /piloromiotomia/i,                                     diag: 'Estenose hipertrófica do piloro' },
+  { match: /Hirschsprung/i,                                       diag: 'Doença de Hirschsprung' },
+  { match: /malformação anorretal/i,                              diag: 'Malformação anorretal congénita' },
+  { match: /atresia esofágica/i,                                  diag: 'Atresia esofágica' },
+  { match: /hérnia diafragmática/i,                               diag: 'Hérnia diafragmática congénita' },
+
+  // Fallback genérico
+  { match: /laparoscopia.*estadiamento/i,                         diag: 'Neoplasia (estadiamento)' },
+  { match: /laparotomia exploradora/i,                            diag: 'Abdómen agudo / Neoplasia (estadiamento)' },
+  { match: /traqueostomia percutânea/i,                           diag: 'Dependência ventilatória prolongada' },
+];
+
+function inferDiagnosis() {
+  var sugg = document.getElementById('diag-suggestions');
+  var input = document.getElementById('f-diagnostico');
+  var badge = document.getElementById('diag-ai-badge');
+
+  if (!selectedProcs.length) {
+    sugg.innerHTML = '';
+    badge.style.display = 'none';
+    return;
+  }
+
+  // Find all matching diagnoses (avoid duplicates)
+  var found = [];
+  selectedProcs.forEach(function(proc) {
+    DIAG_MAP.forEach(function(entry) {
+      if (entry.match.test(proc) && found.indexOf(entry.diag) === -1) {
+        found.push(entry.diag);
+      }
+    });
+  });
+
+  if (!found.length) { sugg.innerHTML = ''; badge.style.display = 'none'; return; }
+
+  badge.style.display = 'inline-flex';
+
+  // Render suggestion chips
+  sugg.innerHTML = found.map(function(d) {
+    return '<div class="chip ai-filled" style="font-size:12px" onclick="applyDiag(\'' + d.replace(/'/g,"&#39;") + '\')">' + d + '</div>';
+  }).join('');
+
+  // Auto-apply first suggestion if field is empty or was previously auto-filled
+  if (!input.dataset.userEdited) {
+    input.value = found[0];
+    input.style.color = 'var(--green)';
+  }
+}
+
+function applyDiag(diag) {
+  var input = document.getElementById('f-diagnostico');
+  input.value = diag;
+  input.style.color = 'var(--green)';
+  input.dataset.userEdited = '';
+}
+
+// Mark as user-edited when typed manually
+document.addEventListener('DOMContentLoaded', function() {
+  var inp = document.getElementById('f-diagnostico');
+  if (inp) {
+    inp.addEventListener('input', function() {
+      inp.dataset.userEdited = '1';
+      inp.style.color = 'var(--text)';
+    });
+  }
+});
 function renderSelected() {
   var el = document.getElementById('sel-display');
   if (!selectedProcs.length) { el.innerHTML = '<span class="sel-placeholder">Nenhum selecionado</span>'; return; }
@@ -1202,6 +1535,7 @@ function buildReview() {
     ['Estágio', document.getElementById('f-estagio').value || '—'],
     ['Regime', document.getElementById('f-regime').value || '—'],
     ['Procedimento(s)', selectedProcs.join(' | ') || '—'],
+    ['Diagnóstico', document.getElementById('f-diagnostico').value || '—'],
     ['Dados do Doente', 'NSC: ' + (document.getElementById('f-nsc').value||'—') + ' | ' + (document.getElementById('f-sexo').value||'—') + ' | ' + (document.getElementById('f-idade').value||'—') + 'a | ' + (document.getElementById('f-peso').value||'—') + 'kg'],
     ['ASA', document.getElementById('f-asa').value || '—'],
     ['Técnica', getChips('chips-tec')],
@@ -1237,6 +1571,7 @@ function collectData() {
     estagio: document.getElementById('f-estagio').value,
     regime: document.getElementById('f-regime').value,
     procedimentos: selectedProcs.join(' | '),
+    diagnostico: document.getElementById('f-diagnostico').value,
     asa: document.getElementById('f-asa').value,
     
     tecnica_anest: tecFinal,
@@ -1312,7 +1647,13 @@ function newRecord() {
   selectedProcs = []; aiProcs = []; imageBase64 = null; renderSelected();
   document.getElementById('proc-lists').innerHTML = '';
   document.getElementById('f-data').value = today;
-  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc','f-uces-num','f-tubo-size','f-vol-neuroeixo','f-vol-bnp'].forEach(function(id){document.getElementById(id).value='';});
+  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc','f-uces-num','f-tubo-size','f-vol-neuroeixo','f-vol-bnp','f-diagnostico'].forEach(function(id){ var el = document.getElementById(id); if(el){el.value='';} });
+  var diagInp = document.getElementById('f-diagnostico');
+  if (diagInp) { diagInp.dataset.userEdited = ''; diagInp.style.color = ''; }
+  var diagSugg = document.getElementById('diag-suggestions');
+  if (diagSugg) diagSugg.innerHTML = '';
+  var diagBadge = document.getElementById('diag-ai-badge');
+  if (diagBadge) diagBadge.style.display = 'none';
   document.getElementById('f-asa').selectedIndex = 1; document.getElementById('f-posicao').selectedIndex = 0;
   
   document.getElementById('preview-img').style.display = 'none'; document.getElementById('scan-btn').style.display = 'none';
@@ -1668,6 +2009,213 @@ function selectEstagioFilter(estagio) {
     c.classList.toggle('on', c.textContent.trim().startsWith(estagio));
   });
   renderEstagioDetail(records, estagio);
+}
+
+// ─── HISTÓRICO ────────────────────────────────────────────────────────────────
+
+function openHist() {
+  document.getElementById('hist-overlay').classList.add('show');
+  document.getElementById('hist-btn').classList.add('stats-active');
+  document.getElementById('hist-search-input').value = '';
+  renderHistList();
+}
+
+function closeHist() {
+  document.getElementById('hist-overlay').classList.remove('show');
+  document.getElementById('hist-btn').classList.remove('stats-active');
+}
+
+function renderHistList() {
+  var records = getRecords();
+  var q = (document.getElementById('hist-search-input').value || '').toLowerCase().trim();
+
+  // Ordenar por data desc e atribuir número cronológico
+  var sorted = records.map(function(r, origIdx) { return { r: r, origIdx: origIdx }; });
+  sorted.sort(function(a, b) { return (a.r.data || '').localeCompare(b.r.data || ''); });
+  // Número é a posição cronológica (1 = mais antigo)
+  sorted.forEach(function(item, i) { item.chronoNum = i + 1; });
+  // Mostrar do mais recente para o mais antigo
+  sorted.reverse();
+
+  var filtered = sorted;
+  if (q) {
+    filtered = sorted.filter(function(item) {
+      var r = item.r;
+      var haystack = [
+        r.diagnostico, r.estagio, r.procedimentos,
+        r.tecnica_anestesica, r.abordagem_va, r.observacoes,
+        r.asa ? 'ASA ' + r.asa : '', r.data
+      ].join(' ').toLowerCase();
+      return haystack.indexOf(q) !== -1;
+    });
+  }
+
+  var countEl = document.getElementById('hist-count');
+  if (q) {
+    countEl.textContent = filtered.length + ' resultado' + (filtered.length !== 1 ? 's' : '') + ' de ' + records.length + ' casos';
+  } else {
+    countEl.textContent = records.length + ' caso' + (records.length !== 1 ? 's' : '') + ' registado' + (records.length !== 1 ? 's' : '');
+  }
+
+  var list = document.getElementById('hist-list');
+  if (!records.length) {
+    list.innerHTML = '<div class="hist-empty">Ainda não há casos registados.</div>';
+    return;
+  }
+  if (!filtered.length) {
+    list.innerHTML = '<div class="hist-empty">Nenhum caso encontrado para "<strong>' + escHtml(q) + '</strong>".</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(function(item) {
+    var r = item.r;
+    var idx = item.origIdx;
+    var num = item.chronoNum;
+    var diag = r.diagnostico || '—';
+    var procs = Array.isArray(r.procedimentos) ? r.procedimentos.join(' · ') : (r.procedimentos || '—');
+    var dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
+    var idade = r.idade ? r.idade + ' anos' : '';
+    var sexo = r.sexo || '';
+    var asa = r.asa ? 'ASA ' + r.asa : '';
+    var tecnica = r.tecnica_anestesica || '';
+
+    var diagHL = q ? hlText(diag, q) : escHtml(diag);
+    var procsHL = q ? hlText(procs, q) : escHtml(procs);
+
+    var tags = [idade, sexo, asa, tecnica].filter(Boolean).map(function(t){
+      return '<span class="hist-tag">' + escHtml(t) + '</span>';
+    }).join('');
+
+    return '<div class="hist-item">' +
+      '<div class="hist-item-body" onclick="openCaseDetail(' + idx + ',' + num + ')">' +
+        '<div class="hist-item-top">' +
+          '<span class="hist-num">#' + num + '</span>' +
+          '<span class="hist-date">' + dataFmt + '</span>' +
+          '<span class="hist-estagio">' + escHtml(r.estagio || '') + '</span>' +
+        '</div>' +
+        '<div class="hist-diag">' + diagHL + '</div>' +
+        '<div class="hist-proc">' + procsHL + '</div>' +
+        (tags ? '<div class="hist-meta">' + tags + '</div>' : '') +
+      '</div>' +
+      '<div class="hist-del-btn" onclick="deleteCase(' + idx + ')" title="Apagar caso">' +
+        '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function deleteCase(origIdx) {
+  if (!confirm('Apagar este caso? Esta ação não pode ser desfeita.')) return;
+  var records = getRecords();
+  records.splice(origIdx, 1);
+  localStorage.setItem('casuistica', JSON.stringify(records));
+  renderHistList();
+}
+
+function openCaseDetail(origIdx, chronoNum) {
+  var records = getRecords();
+  var r = records[origIdx];
+  if (!r) return;
+
+  document.getElementById('case-title').textContent = 'Caso #' + chronoNum;
+
+  var dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
+  var procs = Array.isArray(r.procedimentos) ? r.procedimentos.join(', ') : (r.procedimentos || '—');
+  var bnp = Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '');
+  var monit = Array.isArray(r.monitorizacao) ? r.monitorizacao.join(', ') : (r.monitorizacao || '');
+  var neuroeixo = Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || '');
+  var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.join(', ') : (r.sangue_fluidos || '');
+  var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.join(', ') : (r.acesso_arterial || '');
+  var cvc = Array.isArray(r.cvc) ? r.cvc.join(', ') : (r.cvc || '');
+  var compl = r.complicacoes || 'Nenhuma';
+
+  function row(label, value) {
+    if (!value) return '';
+    return '<div class="case-row"><span class="case-row-label">' + escHtml(label) + '</span><span class="case-row-value">' + escHtml(value) + '</span></div>';
+  }
+  function section(title, rows) {
+    var content = rows.filter(Boolean).join('');
+    if (!content) return '';
+    return '<div class="case-section"><div class="case-section-hdr">' + title + '</div>' + content + '</div>';
+  }
+
+  var html = section('Identificação', [
+    row('Data', dataFmt),
+    row('Estágio', r.estagio),
+    row('Regime', r.regime),
+    row('Nº Processo', r.nsc),
+    row('Diagnóstico', r.diagnostico)
+  ]) +
+  section('Doente', [
+    row('Sexo', r.sexo),
+    row('Idade', r.idade ? r.idade + ' anos' : ''),
+    row('Peso', r.peso ? r.peso + ' kg' : ''),
+    row('Altura', r.altura ? r.altura + ' cm' : ''),
+    row('IMC', r.imc ? r.imc + ' kg/m²' : ''),
+    row('ASA', r.asa ? 'ASA ' + r.asa : '')
+  ]) +
+  section('Procedimento', [
+    row('Cirurgia', procs),
+    row('Posição', r.posicao),
+    row('Duração', r.duracao),
+    row('Destino pós-op', r.destino_pos_op)
+  ]) +
+  section('Técnica Anestésica', [
+    row('Técnica', r.tecnica_anestesica),
+    row('Via aérea', r.abordagem_va),
+    row('Método VA', r.metodo_va),
+    row('Tubo OT', r.tubo_orotraqueal),
+    row('Neuroeixo', neuroeixo),
+    row('BNP', bnp),
+    row('Orientação BNP', r.orientacao_bnp)
+  ]) +
+  section('Monitorização & Acessos', [
+    row('Monitorização', monit),
+    row('Acesso arterial', acesso_art),
+    row('CVC', cvc),
+    row('Sangue / Fluidos', sangue)
+  ]) +
+  section('Autonomia', [
+    row('Via aérea', r.autonomia_va),
+    row('Neuroeixo', r.autonomia_neuroeixo),
+    row('BNP', r.autonomia_bnp),
+    row('Geral', r.autonomia_geral)
+  ]) +
+  section('Complicações & Notas', [
+    row('Complicações', compl),
+    row('Observações', r.observacoes)
+  ]) +
+  '<div class="case-del-btn" onclick="deleteCaseFromDetail(' + origIdx + ',\'' + escHtml(chronoNum+'') + '\')">' +
+    '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
+    'Apagar este caso' +
+  '</div>';
+
+  document.getElementById('case-body').innerHTML = html;
+  document.getElementById('case-overlay').classList.add('show');
+}
+
+function closeCaseDetail() {
+  document.getElementById('case-overlay').classList.remove('show');
+}
+
+function deleteCaseFromDetail(origIdx, num) {
+  if (!confirm('Apagar o Caso #' + num + '? Esta ação não pode ser desfeita.')) return;
+  var records = getRecords();
+  records.splice(origIdx, 1);
+  localStorage.setItem('casuistica', JSON.stringify(records));
+  closeCaseDetail();
+  renderHistList();
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function hlText(text, q) {
+  if (!q) return escHtml(text);
+  var escaped = escHtml(text);
+  var escapedQ = escHtml(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return escaped.replace(new RegExp('(' + escapedQ + ')', 'gi'), '<mark class="highlight">$1</mark>');
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
