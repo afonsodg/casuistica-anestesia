@@ -22,97 +22,39 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root {
-    --blue: #185FA5;
-    --blue-light: #E6F1FB;
-    --blue-mid: #378ADD;
-    --blue-dark: #0C447C;
-    --green: #0F6E56;
-    --green-light: #EAF3DE;
-    --green-mid: #639922;
-    --green-dark: #27500A;
-    --purple: #534AB7;
-    --purple-light: #EEEDFE;
-    --purple-dark: #3C3489;
-    --red: #A32D2D;
-    --red-light: #FCEBEB;
-    --amber-light: #FAEEDA;
-    --gray-bg: #F5F5F3;
-    --gray-border: rgba(0,0,0,0.1);
-    --gray-border-strong: rgba(0,0,0,0.2);
-    --text: #1a1a1a;
-    --text-muted: #6b6b6b;
-    --text-faint: #9a9a9a;
-    --surface: #ffffff;
-    --surface-raised: #ffffff;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --blue: #185FA5; --blue-light: #E6F1FB; --blue-mid: #378ADD; --blue-dark: #0C447C;
+    --green: #0F6E56; --green-light: #EAF3DE; --green-mid: #639922; --green-dark: #27500A;
+    --purple: #534AB7; --purple-light: #EEEDFE; --purple-dark: #3C3489;
+    --red: #A32D2D; --red-light: #FCEBEB; --amber-light: #FAEEDA;
+    --gray-bg: #F5F5F3; --gray-border: rgba(0,0,0,0.1); --gray-border-strong: rgba(0,0,0,0.2);
+    --text: #1a1a1a; --text-muted: #6b6b6b; --text-faint: #9a9a9a;
+    --surface: #ffffff; --surface-raised: #ffffff;
+    --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --gray-bg: #1c1c1e;
-      --gray-border: rgba(255,255,255,0.1);
-      --gray-border-strong: rgba(255,255,255,0.2);
-      --text: #f0f0f0;
-      --text-muted: #ababab;
-      --text-faint: #666;
-      --surface: #2c2c2e;
-      --surface-raised: #3a3a3c;
-      --blue-light: #1a2d40;
-      --green-light: #1a2e20;
-      --purple-light: #1e1c3a;
-      --red-light: #3a1c1c;
-      --amber-light: #2e2010;
+      --gray-bg: #1c1c1e; --gray-border: rgba(255,255,255,0.1); --gray-border-strong: rgba(255,255,255,0.2);
+      --text: #f0f0f0; --text-muted: #ababab; --text-faint: #666;
+      --surface: #2c2c2e; --surface-raised: #3a3a3c;
+      --blue-light: #1a2d40; --green-light: #1a2e20; --purple-light: #1e1c3a;
+      --red-light: #3a1c1c; --amber-light: #2e2010;
     }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-    background: var(--gray-bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding-top: var(--safe-top);
-  }
-
-  .app {
-    max-width: 430px;
-    margin: 0 auto;
-    padding: 0 0 calc(20px + var(--safe-bottom));
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; padding-top: var(--safe-top); }
+  .app { max-width: 430px; margin: 0 auto; padding: 0 0 calc(20px + var(--safe-bottom)); }
 
   /* TOP BAR */
-  .topbar {
-    background: var(--surface);
-    border-bottom: 0.5px solid var(--gray-border);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topbar-icon {
-    width: 32px; height: 32px;
-    background: var(--blue);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
+  .topbar { background: var(--surface); border-bottom: 0.5px solid var(--gray-border); padding: 12px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; }
+  .topbar-icon { width: 32px; height: 32px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .topbar-icon svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
   .topbar h1 { font-size: 15px; font-weight: 600; color: var(--text); }
   .topbar p { font-size: 11px; color: var(--text-muted); }
   .topbar-actions { margin-left: auto; display: flex; gap: 8px; }
-  .icon-btn {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    border: 0.5px solid var(--gray-border);
-    background: var(--gray-bg);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-  }
+  .icon-btn { width: 32px; height: 32px; border-radius: 8px; border: 0.5px solid var(--gray-border); background: var(--gray-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .icon-btn svg { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; }
 
   /* PROGRESS */
@@ -129,83 +71,28 @@
   .screen.show { display: block; }
   .hidden { display: none !important; }
 
-  .info-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px;
-  }
+  .info-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .info-bar h2 { font-size: 17px; font-weight: 600; color: var(--text); }
   .info-bar .step-num { font-size: 12px; color: var(--text-muted); }
 
   /* CARDS */
-  .card {
-    background: var(--surface);
-    border: 0.5px solid var(--gray-border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 12px;
-  }
-  .card-header {
-    padding: 8px 14px;
-    border-bottom: 0.5px solid var(--gray-border);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    background: var(--gray-bg);
-  }
+  .card { background: var(--surface); border: 0.5px solid var(--gray-border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .card-header { padding: 8px 14px; border-bottom: 0.5px solid var(--gray-border); font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.4px; text-transform: uppercase; background: var(--gray-bg); }
 
   /* FIELD ROWS */
-  .field-row {
-    display: flex; align-items: center;
-    padding: 11px 14px;
-    border-bottom: 0.5px solid var(--gray-border);
-    gap: 8px;
-    transition: background 0.15s;
-  }
+  .field-row { display: flex; align-items: center; padding: 11px 14px; border-bottom: 0.5px solid var(--gray-border); gap: 8px; transition: background 0.15s; }
   .field-row:last-child { border-bottom: none; }
   .field-row.ai-hl { background: var(--green-light); }
-  .field-label {
-    font-size: 14px;
-    color: var(--text-muted);
-    min-width: 110px;
-    flex-shrink: 0;
-  }
-  .field-row select,
-  .field-row input[type=text],
-  .field-row input[type=number],
-  .field-row input[type=date] {
-    flex: 1; border: none; background: transparent;
-    font-size: 14px; color: var(--text);
-    text-align: right; font-family: inherit;
-    outline: none; min-width: 0;
-    -webkit-appearance: none;
-  }
+  .field-label { font-size: 14px; color: var(--text-muted); min-width: 110px; flex-shrink: 0; }
+  .field-row select, .field-row input[type=text], .field-row input[type=number], .field-row input[type=date] { flex: 1; border: none; background: transparent; font-size: 14px; color: var(--text); text-align: right; font-family: inherit; outline: none; min-width: 0; -webkit-appearance: none; }
   .field-row select option { color: #111; background: #fff; }
 
   /* CHIPS */
-  .chip-wrap {
-    padding: 10px 14px;
-    border-bottom: 0.5px solid var(--gray-border);
-  }
+  .chip-wrap { padding: 10px 14px; border-bottom: 0.5px solid var(--gray-border); }
   .chip-wrap:last-child { border-bottom: none; }
-  .sublabel {
-    font-size: 11px; color: var(--text-faint);
-    margin-bottom: 8px; display: block;
-  }
+  .sublabel { font-size: 11px; color: var(--text-faint); margin-bottom: 8px; display: block; }
   .chips { display: flex; flex-wrap: wrap; gap: 7px; }
-  .chip {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    border: 0.5px solid var(--gray-border-strong);
-    background: var(--gray-bg);
-    color: var(--text);
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.12s;
-    -webkit-tap-highlight-color: transparent;
-  }
+  .chip { padding: 5px 12px; border-radius: 20px; font-size: 13px; border: 0.5px solid var(--gray-border-strong); background: var(--gray-bg); color: var(--text); cursor: pointer; user-select: none; transition: all 0.12s; -webkit-tap-highlight-color: transparent; }
   .chip:active { transform: scale(0.96); }
   .chip.on { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue-dark); }
   .chip.freq { border-color: var(--blue); font-weight: 500; }
@@ -214,74 +101,37 @@
   
   /* SPECIFIC CHIPS */
   .chip.vad-on { background: var(--red-light); border-color: var(--red); color: var(--red); font-weight: 600; }
-  .autonomy-bar { background: rgba(0,0,0,0.03); padding: 8px 10px; border-radius: 8px; margin-top: 8px; border: 1px dashed var(--gray-border-strong); }
+  .autonomy-bar { background: rgba(0,0,0,0.03); padding: 10px 12px; border-radius: 8px; margin-top: 8px; border: 1px dashed var(--gray-border-strong); }
   .autonomy-bar .sublabel { margin-bottom: 6px; font-weight: 500; color: var(--text-muted); }
   .autonomy-bar .chip { font-size: 12px; padding: 4px 10px; }
+  .bar-section { margin-bottom: 12px; }
+  .bar-section:last-child { margin-bottom: 0; }
 
   /* PROC SELECTOR */
-  .selected-procs {
-    background: var(--gray-bg);
-    border-radius: 10px;
-    padding: 8px 10px;
-    margin-bottom: 10px;
-    min-height: 38px;
-    display: flex; flex-wrap: wrap; gap: 6px;
-    border: 0.5px solid var(--gray-border);
-  }
-  .sel-tag {
-    background: var(--blue-light);
-    border: 0.5px solid var(--blue-mid);
-    color: var(--blue-dark);
-    border-radius: 20px;
-    padding: 4px 10px;
-    font-size: 13px;
-    display: flex; align-items: center; gap: 5px;
-    cursor: pointer;
-  }
+  .selected-procs { background: var(--gray-bg); border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; min-height: 38px; display: flex; flex-wrap: wrap; gap: 6px; border: 0.5px solid var(--gray-border); }
+  .sel-tag { background: var(--blue-light); border: 0.5px solid var(--blue-mid); color: var(--blue-dark); border-radius: 20px; padding: 4px 10px; font-size: 13px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
   .sel-tag.ai-tag { background: var(--green-light); border-color: var(--green-mid); color: var(--green-dark); }
   .sel-tag .x { font-size: 15px; line-height: 1; font-weight: 400; opacity: 0.7; }
   .sel-placeholder { font-size: 13px; color: var(--text-faint); line-height: 2.2; }
   .proc-section { margin-bottom: 12px; }
-  .proc-section-label {
-    font-size: 10px; font-weight: 600; color: var(--text-faint);
-    letter-spacing: 0.3px; text-transform: uppercase;
-    margin-bottom: 6px;
-  }
+  .proc-section-label { font-size: 10px; font-weight: 600; color: var(--text-faint); letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 6px; }
   .custom-row { display: flex; gap: 6px; margin-top: 10px; }
-  .custom-row input {
-    flex: 1; border: 0.5px solid var(--gray-border-strong); border-radius: 10px; padding: 8px 12px;
-    font-size: 13px; font-family: inherit; background: var(--surface); color: var(--text); outline: none;
-  }
-  .custom-row button {
-    padding: 8px 14px; border-radius: 10px; border: 0.5px solid var(--blue); background: var(--blue-light);
-    color: var(--blue-dark); font-size: 13px; font-family: inherit; cursor: pointer; white-space: nowrap; font-weight: 500;
-  }
-  .legend {
-    display: flex; gap: 12px; font-size: 11px; color: var(--text-faint); margin-bottom: 10px; align-items: center; flex-wrap: wrap;
-  }
+  .custom-row input { flex: 1; border: 0.5px solid var(--gray-border-strong); border-radius: 10px; padding: 8px 12px; font-size: 13px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; }
+  .custom-row button { padding: 8px 14px; border-radius: 10px; border: 0.5px solid var(--blue); background: var(--blue-light); color: var(--blue-dark); font-size: 13px; font-family: inherit; cursor: pointer; white-space: nowrap; font-weight: 500; }
+  .legend { display: flex; gap: 12px; font-size: 11px; color: var(--text-faint); margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
   /* BUTTONS & SCAN */
   .btn-bar { display: flex; gap: 8px; margin-top: 16px; }
-  .btn {
-    flex: 1; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 600;
-    border: 0.5px solid var(--gray-border-strong); cursor: pointer; font-family: inherit;
-    background: var(--gray-bg); color: var(--text); transition: opacity 0.15s, transform 0.1s;
-  }
+  .btn { flex: 1; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 600; border: 0.5px solid var(--gray-border-strong); cursor: pointer; font-family: inherit; background: var(--gray-bg); color: var(--text); transition: opacity 0.15s, transform 0.1s; }
   .btn:active { opacity: 0.7; transform: scale(0.98); }
   .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
   .btn-success { background: var(--green); color: #fff; border-color: var(--green); }
   .btn-purple { background: var(--purple); color: #fff; border-color: var(--purple); display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-  .scan-zone {
-    border: 1.5px dashed var(--gray-border-strong); border-radius: 14px; padding: 32px 16px;
-    text-align: center; cursor: pointer; position: relative; overflow: hidden; margin-bottom: 12px;
-  }
+  .scan-zone { border: 1.5px dashed var(--gray-border-strong); border-radius: 14px; padding: 32px 16px; text-align: center; cursor: pointer; position: relative; overflow: hidden; margin-bottom: 12px; }
   .scan-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .scan-icon {
-    width: 48px; height: 48px; border-radius: 50%; background: var(--purple-light);
-    display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;
-  }
+  .scan-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--purple-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
   .scan-icon svg { width: 24px; height: 24px; stroke: var(--purple); fill: none; stroke-width: 2; stroke-linecap: round; }
   .preview-img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 12px; border: 0.5px solid var(--gray-border); margin-bottom: 10px; display: none; }
   .scanning-overlay { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 28px; gap: 12px; text-align: center; }
@@ -491,16 +341,19 @@
       <div class="chip-wrap">
         <span class="sublabel">Abordagem</span>
         <div class="chips" id="chips-va">
-          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va', true)">IOT</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va', true)">Nasotraqueal</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va', true)">Submentoniana</div>
-          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va', true)">Máscara laríngea</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va', true)">Máscara facial</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va', true)">Sem abordagem</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va', true)">Ligação ao ventilador</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-va', true)">Jet ventilation</div>
+          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va-box', true)">IOT</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Nasotraqueal</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Submentoniana</div>
+          <div class="chip freq" onclick="checkAutonomy(this, 'aut-va-box', true)">Máscara laríngea</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Máscara facial</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Sem abordagem</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Ligação ao ventilador</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-va-box', true)">Jet ventilation</div>
         </div>
-        <div class="autonomy-bar hidden" id="aut-va"><span class="sublabel">Autonomia (Via Aérea)</span><div class="chips"><div class="chip" onclick="solo(this, 'aut-va')">Autónomo</div><div class="chip" onclick="solo(this, 'aut-va')">Com ajuda</div><div class="chip" onclick="solo(this, 'aut-va')">Feito por outro</div></div></div>
+        <div class="autonomy-bar hidden" id="aut-va-box">
+          <span class="sublabel">Autonomia (Via Aérea)</span>
+          <div class="chips" id="chips-aut-va"><div class="chip" onclick="solo(this, 'chips-aut-va')">Autónomo</div><div class="chip" onclick="solo(this, 'chips-aut-va')">Com ajuda</div><div class="chip" onclick="solo(this, 'chips-aut-va')">Feito por outro</div></div>
+        </div>
       </div>
       <div class="chip-wrap">
         <span class="sublabel">Método / Adicionais</span>
@@ -536,10 +389,13 @@
       <div class="card-header">Neuro-eixo</div>
       <div class="chip-wrap">
         <div class="chips" id="chips-cent">
-          <div class="chip" onclick="checkAutonomy(this, 'aut-cent', false)">Subaracnoideu</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent', false)">Epidural lombar</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-cent', false)">Epidural torácica</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent', false)">Sequencial</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent', false)">Nenhuma</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Subaracnoideu</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Epidural lombar</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Epidural torácica</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Sequencial</div><div class="chip" onclick="checkAutonomy(this, 'aut-cent-box', false)">Nenhuma</div>
         </div>
-        <div class="autonomy-bar hidden" id="aut-cent"><span class="sublabel">Autonomia (Neuro-eixo)</span><div class="chips"><div class="chip" onclick="solo(this, 'aut-cent')">Autónomo</div><div class="chip" onclick="solo(this, 'aut-cent')">Com ajuda</div><div class="chip" onclick="solo(this, 'aut-cent')">Feito por outro</div></div></div>
+        <div class="autonomy-bar hidden" id="aut-cent-box">
+          <span class="sublabel">Autonomia (Neuro-eixo)</span>
+          <div class="chips" id="chips-aut-cent"><div class="chip" onclick="solo(this, 'chips-aut-cent')">Autónomo</div><div class="chip" onclick="solo(this, 'chips-aut-cent')">Com ajuda</div><div class="chip" onclick="solo(this, 'chips-aut-cent')">Feito por outro</div></div>
+        </div>
       </div>
     </div>
     
@@ -547,16 +403,22 @@
       <div class="card-header">BNP periférico</div>
       <div class="chip-wrap">
         <div class="chips" id="chips-bnp">
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Axilar</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Supraclavicular</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Interescalénico</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Canal dos adutores</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Ciático popliteu</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Fascia ilíaca</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">PENG</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">TAP</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Femoral</div>
-          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">CFL</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">ESPB</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Serrátil</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp', false)">Nenhum</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Axilar</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Supraclavicular</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Interescalénico</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Canal dos adutores</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Ciático popliteu</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Fascia ilíaca</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">PENG</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">TAP</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Femoral</div>
+          <div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">CFL</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">ESPB</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Serrátil</div><div class="chip" onclick="checkAutonomy(this, 'aut-bnp-box', false)">Nenhum</div>
         </div>
-        <div class="autonomy-bar hidden" id="aut-bnp"><span class="sublabel">Autonomia (BNP)</span><div class="chips"><div class="chip" onclick="solo(this, 'aut-bnp')">Autónomo</div><div class="chip" onclick="solo(this, 'aut-bnp')">Com ajuda</div><div class="chip" onclick="solo(this, 'aut-bnp')">Feito por outro</div></div></div>
-      </div>
-      <div class="chip-wrap">
-        <span class="sublabel">Orientação</span>
-        <div class="chips" id="chips-guia"><div class="chip" onclick="solo(this,'chips-guia')">Ecoguiado</div><div class="chip" onclick="solo(this,'chips-guia')">Neuroestimulação</div><div class="chip" onclick="solo(this,'chips-guia')">Referências anatómicas</div></div>
+        
+        <div class="autonomy-bar hidden" id="aut-bnp-box">
+          <div class="bar-section">
+            <span class="sublabel">Autonomia</span>
+            <div class="chips" id="chips-aut-bnp"><div class="chip" onclick="solo(this, 'chips-aut-bnp')">Autónomo</div><div class="chip" onclick="solo(this, 'chips-aut-bnp')">Com ajuda</div><div class="chip" onclick="solo(this, 'chips-aut-bnp')">Feito por outro</div></div>
+          </div>
+          <div class="bar-section">
+            <span class="sublabel">Orientação</span>
+            <div class="chips" id="chips-guia-bnp"><div class="chip" onclick="solo(this, 'chips-guia-bnp')">Ecoguiado</div><div class="chip" onclick="solo(this, 'chips-guia-bnp')">Neuroestimulação</div><div class="chip" onclick="solo(this, 'chips-guia-bnp')">Ref. anatómicas</div></div>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -594,24 +456,42 @@
       <div class="card-header">Acessos invasivos</div>
       <div class="chip-wrap">
         <span class="sublabel">Acesso arterial</span>
-        <div class="chips" id="chips-art"><div class="chip" onclick="checkAutonomy(this, 'aut-art', false)">Linha radial</div><div class="chip" onclick="checkAutonomy(this, 'aut-art', false)">Linha umeral</div><div class="chip" onclick="checkAutonomy(this, 'aut-art', false)">Linha femoral</div><div class="chip" onclick="checkAutonomy(this, 'aut-art', false)">Ecoguiada</div></div>
-        <div class="autonomy-bar hidden" id="aut-art"><span class="sublabel">Autonomia (Arterial)</span><div class="chips"><div class="chip" onclick="solo(this, 'aut-art')">Autónomo</div><div class="chip" onclick="solo(this, 'aut-art')">Com ajuda</div><div class="chip" onclick="solo(this, 'aut-art')">Feito por outro</div></div></div>
+        <div class="chips" id="chips-art">
+          <div class="chip" onclick="checkAutonomy(this, 'aut-art-box', false)">Linha radial</div><div class="chip" onclick="checkAutonomy(this, 'aut-art-box', false)">Linha umeral</div><div class="chip" onclick="checkAutonomy(this, 'aut-art-box', false)">Linha femoral</div>
+        </div>
+        <div class="autonomy-bar hidden" id="aut-art-box">
+          <div class="bar-section">
+            <span class="sublabel">Autonomia</span>
+            <div class="chips" id="chips-aut-art"><div class="chip" onclick="solo(this, 'chips-aut-art')">Autónomo</div><div class="chip" onclick="solo(this, 'chips-aut-art')">Com ajuda</div><div class="chip" onclick="solo(this, 'chips-aut-art')">Feito por outro</div></div>
+          </div>
+          <div class="bar-section">
+            <span class="sublabel">Método</span>
+            <div class="chips" id="chips-metodo-art"><div class="chip" onclick="toggle(this)">Ecoguiada</div><div class="chip" onclick="toggle(this)">Ref. anatómicas</div></div>
+          </div>
+        </div>
       </div>
       <div class="chip-wrap">
         <span class="sublabel">CVC / outros</span>
-        <div class="chips" id="chips-cvc"><div class="chip" onclick="checkAutonomy(this, 'aut-cvc', false)">Jugular interno</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc', false)">Subclávia</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc', false)">Femoral</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc', false)">CVCTI</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc', false)">DVE</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc', false)">Ecoguiado</div></div>
-        <div class="autonomy-bar hidden" id="aut-cvc"><span class="sublabel">Autonomia (CVC)</span><div class="chips"><div class="chip" onclick="solo(this, 'aut-cvc')">Autónomo</div><div class="chip" onclick="solo(this, 'aut-cvc')">Com ajuda</div><div class="chip" onclick="solo(this, 'aut-cvc')">Feito por outro</div></div></div>
+        <div class="chips" id="chips-cvc">
+          <div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Jugular interno</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Subclávia</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">Femoral</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">CVCTI</div><div class="chip" onclick="checkAutonomy(this, 'aut-cvc-box', false)">DVE</div>
+        </div>
+        <div class="autonomy-bar hidden" id="aut-cvc-box">
+          <div class="bar-section">
+            <span class="sublabel">Autonomia</span>
+            <div class="chips" id="chips-aut-cvc"><div class="chip" onclick="solo(this, 'chips-aut-cvc')">Autónomo</div><div class="chip" onclick="solo(this, 'chips-aut-cvc')">Com ajuda</div><div class="chip" onclick="solo(this, 'chips-aut-cvc')">Feito por outro</div></div>
+          </div>
+          <div class="bar-section">
+            <span class="sublabel">Método</span>
+            <div class="chips" id="chips-metodo-cvc"><div class="chip" onclick="toggle(this)">Ecoguiado</div><div class="chip" onclick="toggle(this)">Ref. anatómicas</div></div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-header">Fluidos e Sangue</div>
       <div class="chip-wrap">
-        <div class="chips" id="chips-sangue">
-          <div class="chip" onclick="toggle(this)">Cell-Saver utilizado</div>
-          <div class="chip" onclick="toggle(this)">Transfusão CGR</div>
-          <div class="chip" onclick="toggle(this)">Transfusão PFC / Plaquetas</div>
-        </div>
+        <div class="chips" id="chips-sangue"><div class="chip" onclick="toggle(this)">Cell-Saver</div><div class="chip" onclick="toggle(this)">Transfusão CGR</div><div class="chip" onclick="toggle(this)">Transfusão PFC/Plaquetas</div></div>
       </div>
     </div>
 
@@ -634,10 +514,7 @@
       <div class="chip-wrap">
         <span class="sublabel">Nível de Participação Global</span>
         <div class="chips" id="chips-participacao">
-          <div class="chip freq" onclick="solo(this,'chips-participacao')">1º Operador (Autónomo)</div>
-          <div class="chip freq" onclick="solo(this,'chips-participacao')">1º Operador (Com ajuda)</div>
-          <div class="chip" onclick="solo(this,'chips-participacao')">2º Operador / Ajudante</div>
-          <div class="chip" onclick="solo(this,'chips-participacao')">Observador</div>
+          <div class="chip freq" onclick="solo(this,'chips-participacao')">1º Operador (Autónomo)</div><div class="chip freq" onclick="solo(this,'chips-participacao')">1º Operador (Com ajuda)</div><div class="chip" onclick="solo(this,'chips-participacao')">2º Operador / Ajudante</div><div class="chip" onclick="solo(this,'chips-participacao')">Observador</div>
         </div>
       </div>
     </div>
@@ -671,7 +548,6 @@
     </div>
 
     <div class="card" id="review-card"><div class="card-header">Resumo</div></div>
-    
     <div class="btn-bar"><button class="btn" onclick="goTo(4)">← Voltar</button><button class="btn btn-success" onclick="submitRecord()">Guardar registo</button></div>
   </div>
 
@@ -820,11 +696,7 @@ function loadSettings() {
 }
 function saveSettings() {
   try {
-    localStorage.setItem('cas-settings', JSON.stringify({
-      apiKey: document.getElementById('set-api-key').value,
-      gsUrl: document.getElementById('set-gs-url').value,
-      nome: document.getElementById('set-nome').value
-    }));
+    localStorage.setItem('cas-settings', JSON.stringify({ apiKey: document.getElementById('set-api-key').value, gsUrl: document.getElementById('set-gs-url').value, nome: document.getElementById('set-nome').value }));
   } catch(e) {}
 }
 function getSetting(k) { try { return JSON.parse(localStorage.getItem('cas-settings') || '{}')[k] || ''; } catch(e) { return ''; } }
@@ -850,71 +722,43 @@ function goTo(n) {
 }
 
 // ─── LOGIC: FÁRMACOS SISTÉMICOS E COMBINADA ──────────────────────────────────
-function clearDrugs() {
-  document.querySelectorAll('.drug-group .chip').forEach(function(c){ c.classList.remove('on'); });
-}
+function clearDrugs() { document.querySelectorAll('.drug-group .chip').forEach(function(c){ c.classList.remove('on'); }); }
 function updateFarms() {
   var techs = getChipsArray('chips-tec');
   var isComb = techs.indexOf('Combinada') !== -1;
   var rowComb = document.getElementById('row-comb-base');
   
-  if (isComb) rowComb.classList.remove('hidden');
-  else rowComb.classList.add('hidden');
+  if (isComb) rowComb.classList.remove('hidden'); else rowComb.classList.add('hidden');
 
   var activeTec = isComb ? document.getElementById('f-comb-base').value : (techs.length ? techs[0] : '');
   
   var cardFarms = document.getElementById('card-farmacos');
-  var grpIndBal = document.getElementById('grp-inducao-bal');
-  var grpIndIna = document.getElementById('grp-inducao-ina');
-  var grpManut = document.getElementById('grp-manutencao');
-  var grpTiva = document.getElementById('grp-tiva');
-  var grpSedacao = document.getElementById('grp-sedacao');
-  var grpBnm = document.getElementById('grp-bnm');
-  var grpRev = document.getElementById('grp-reversao');
+  var grps = [document.getElementById('grp-inducao-bal'), document.getElementById('grp-inducao-ina'), document.getElementById('grp-manutencao'), document.getElementById('grp-tiva'), document.getElementById('grp-sedacao'), document.getElementById('grp-bnm'), document.getElementById('grp-reversao')];
 
-  // Hide all
-  [grpIndBal, grpIndIna, grpManut, grpTiva, grpSedacao, grpBnm, grpRev].forEach(function(el){ el.classList.add('hidden'); });
+  grps.forEach(function(el){ el.classList.add('hidden'); });
   cardFarms.classList.add('hidden');
   
-  // Clear "phantom data" for anything not relevant anymore
-  // Note: we just clear everything for safety when switching root technique
-  
   if (activeTec === 'AG balanceada') {
-    cardFarms.classList.remove('hidden');
-    grpIndBal.classList.remove('hidden'); grpManut.classList.remove('hidden');
-    grpBnm.classList.remove('hidden'); grpRev.classList.remove('hidden');
+    cardFarms.classList.remove('hidden'); grps[0].classList.remove('hidden'); grps[2].classList.remove('hidden'); grps[5].classList.remove('hidden'); grps[6].classList.remove('hidden');
   } else if (activeTec === 'AG inalatória') {
-    cardFarms.classList.remove('hidden');
-    grpIndIna.classList.remove('hidden'); grpManut.classList.remove('hidden');
-    grpBnm.classList.remove('hidden'); grpRev.classList.remove('hidden');
+    cardFarms.classList.remove('hidden'); grps[1].classList.remove('hidden'); grps[2].classList.remove('hidden'); grps[5].classList.remove('hidden'); grps[6].classList.remove('hidden');
   } else if (activeTec === 'AG endovenosa (TIVA)') {
-    cardFarms.classList.remove('hidden');
-    grpTiva.classList.remove('hidden');
-    grpBnm.classList.remove('hidden'); grpRev.classList.remove('hidden');
+    cardFarms.classList.remove('hidden'); grps[3].classList.remove('hidden'); grps[5].classList.remove('hidden'); grps[6].classList.remove('hidden');
   } else if (techs.indexOf('Sedação') !== -1 || techs.indexOf('CAM') !== -1) {
-    cardFarms.classList.remove('hidden');
-    grpSedacao.classList.remove('hidden');
+    cardFarms.classList.remove('hidden'); grps[4].classList.remove('hidden');
   }
 }
 function setTecnica(el) {
-  var gid = 'chips-tec';
-  var val = el.textContent.trim();
-  // Se for BSA, Epidural, BNP, Sequencial: podem ser selecionados em simultâneo com sedação, mas limpar AG's.
-  if (val === 'Combinada' || val === 'AG balanceada' || val === 'AG endovenosa (TIVA)' || val === 'AG inalatória') {
-    solo(el, gid); // Estas fecham outras técnicas
-  } else {
-    // Se seleciona sedação, não apaga BSA
-    el.classList.toggle('on');
-  }
-  clearDrugs();
-  updateFarms();
+  var gid = 'chips-tec'; var val = el.textContent.trim();
+  if (val === 'Combinada' || val === 'AG balanceada' || val === 'AG endovenosa (TIVA)' || val === 'AG inalatória') { solo(el, gid); } 
+  else { el.classList.toggle('on'); }
+  clearDrugs(); updateFarms();
 }
 
 // ─── LOGIC: VAD ───────────────────────────────────────────────────────────────
 function setVAD(sim) {
   var chips = document.getElementById('chips-vad-simnao').querySelectorAll('.chip');
-  chips[0].classList.toggle('on', !sim);
-  chips[1].classList.toggle('on', sim);
+  chips[0].classList.toggle('on', !sim); chips[1].classList.toggle('on', sim);
   document.getElementById('vad-criteria-wrap').style.display = sim ? 'block' : 'none';
   if (!sim) { document.getElementById('chips-vad-crit').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); }
 }
@@ -924,13 +768,9 @@ function checkExclusaoPulmonar() {
   var estagio = document.getElementById('f-estagio').value;
   var hasToracica = estagio === 'Torácica';
   var hasEso = selectedProcs.some(function(p){ return p.toLowerCase().indexOf('esofagectomia') !== -1 || p.toLowerCase().indexOf('ivor lewis') !== -1; });
-  
   var card = document.getElementById('card-exclusao');
   if (hasToracica || hasEso) card.classList.remove('hidden');
-  else {
-    card.classList.add('hidden');
-    document.getElementById('chips-exclusao').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
-  }
+  else { card.classList.add('hidden'); document.getElementById('chips-exclusao').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); }
 }
 
 // ─── LOGIC: AUTO-FILL POSICIONAMENTO ──────────────────────────────────────────
@@ -938,9 +778,7 @@ function checkPosicionamento() {
   var pStr = selectedProcs.join(' ').toLowerCase();
   var pDrop = document.getElementById('f-posicao');
   if (!pStr) return;
-
-  var pos = "Decúbito Dorsal"; // default
-
+  var pos = "Decúbito Dorsal";
   if (pStr.indexOf('prostatectomia radical') !== -1 || pStr.indexOf('robótico') !== -1 || pStr.indexOf('ginecologia oncológica') !== -1) pos = "Litotomia + Trendelenburg";
   else if (pStr.indexOf('nefrectomia') !== -1 || pStr.indexOf('lobectomia') !== -1 || pStr.indexOf('pneumonectomia') !== -1) pos = "Decúbito Lateral";
   else if (pStr.indexOf('laminectomia') !== -1 || pStr.indexOf('discectomia') !== -1 || pStr.indexOf('pilonidal') !== -1 || pStr.indexOf('artrodese lombar') !== -1) pos = "Decúbito Ventral (Prone)";
@@ -949,42 +787,26 @@ function checkPosicionamento() {
   else if (pStr.indexOf('rtu-p') !== -1 || pStr.indexOf('rtu-v') !== -1 || pStr.indexOf('histeroscopia') !== -1 || pStr.indexOf('perianal') !== -1) pos = "Litotomia";
   else if (pStr.indexOf('ivor lewis') !== -1) pos = "Decúbito Dorsal + Lateral";
 
-  for (var i = 0; i < pDrop.options.length; i++) {
-    if (pDrop.options[i].text === pos) { pDrop.selectedIndex = i; break; }
-  }
+  for (var i = 0; i < pDrop.options.length; i++) { if (pDrop.options[i].text === pos) { pDrop.selectedIndex = i; break; } }
 }
 
 // ─── LOGIC: CHIPS & AUTONOMY ──────────────────────────────────────────────────
-function solo(el, gid) {
-  document.getElementById(gid).querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on','ai-filled'); });
-  el.classList.toggle('on');
-}
+function solo(el, gid) { document.getElementById(gid).querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on','ai-filled'); }); el.classList.toggle('on'); }
 function toggle(el) { el.classList.toggle('on'); }
-function removeNenhuma(gid) {
-  var chips = document.getElementById(gid).querySelectorAll('.chip');
-  if (chips.length > 0) chips[0].classList.remove('on'); // Assume that "Nenhuma" is the 1st
-}
+function removeNenhuma(gid) { var chips = document.getElementById(gid).querySelectorAll('.chip'); if (chips.length > 0) chips[0].classList.remove('on'); }
 
 function checkAutonomy(el, barId, isSolo) {
   var parentWrap = el.parentNode;
-  if (isSolo) {
-    parentWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
-  }
+  if (isSolo) parentWrap.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
   el.classList.toggle('on');
-  
-  // Se algum chip no container está on, mostra a barra de autonomia associada
   var anyOn = Array.from(parentWrap.querySelectorAll('.chip')).some(function(c){ return c.classList.contains('on'); });
   var bar = document.getElementById(barId);
   if (anyOn) bar.classList.remove('hidden');
-  else {
-    bar.classList.add('hidden');
-    bar.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
-  }
+  else { bar.classList.add('hidden'); bar.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); }
 }
 
 function getChipsArray(gid) {
-  var arr = [];
-  var el = document.getElementById(gid);
+  var arr = []; var el = document.getElementById(gid);
   if (!el) return arr;
   el.querySelectorAll('.chip.on').forEach(function(c){ arr.push(c.textContent.trim()); });
   return arr;
@@ -1006,26 +828,14 @@ function onEstagioChange() {
   });
   checkExclusaoPulmonar();
 }
-function addProc(name, fromAI) {
-  if (selectedProcs.indexOf(name) === -1) { selectedProcs.push(name); if (fromAI) aiProcs.push(name); renderSelected(); checkExclusaoPulmonar(); }
-}
-function removeProc(name) {
-  selectedProcs = selectedProcs.filter(function(p){ return p !== name; });
-  aiProcs = aiProcs.filter(function(p){ return p !== name; });
-  renderSelected(); checkExclusaoPulmonar();
-}
+function addProc(name, fromAI) { if (selectedProcs.indexOf(name) === -1) { selectedProcs.push(name); if (fromAI) aiProcs.push(name); renderSelected(); checkExclusaoPulmonar(); } }
+function removeProc(name) { selectedProcs = selectedProcs.filter(function(p){ return p !== name; }); aiProcs = aiProcs.filter(function(p){ return p !== name; }); renderSelected(); checkExclusaoPulmonar(); }
 function renderSelected() {
   var el = document.getElementById('sel-display');
   if (!selectedProcs.length) { el.innerHTML = '<span class="sel-placeholder">Nenhum selecionado</span>'; return; }
-  el.innerHTML = selectedProcs.map(function(p) {
-    var ai = aiProcs.indexOf(p) !== -1;
-    return '<div class="sel-tag' + (ai ? ' ai-tag' : '') + '" onclick="removeProc(\'' + p.replace(/'/g,"&#39;") + '\')">' + p + '<span class="x">×</span></div>';
-  }).join('');
+  el.innerHTML = selectedProcs.map(function(p) { var ai = aiProcs.indexOf(p) !== -1; return '<div class="sel-tag' + (ai ? ' ai-tag' : '') + '" onclick="removeProc(\'' + p.replace(/'/g,"&#39;") + '\')">' + p + '<span class="x">×</span></div>'; }).join('');
 }
-function addCustomProc() {
-  var inp = document.getElementById('custom-proc'); var val = inp.value.trim();
-  if (val) { addProc(val, false); inp.value = ''; }
-}
+function addCustomProc() { var inp = document.getElementById('custom-proc'); var val = inp.value.trim(); if (val) { addProc(val, false); inp.value = ''; } }
 document.getElementById('custom-proc').addEventListener('keydown', function(e){ if(e.key==='Enter') addCustomProc(); });
 
 // ─── SCAN (IA) ────────────────────────────────────────────────────────────────
@@ -1036,8 +846,7 @@ function onFileSelected(input) {
     imageBase64 = e.target.result.split(',')[1];
     var preview = document.getElementById('preview-img');
     preview.src = e.target.result; preview.style.display = 'block';
-    document.getElementById('scan-btn').style.display = 'flex';
-    document.getElementById('scan-error').style.display = 'none';
+    document.getElementById('scan-btn').style.display = 'flex'; document.getElementById('scan-error').style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
@@ -1062,10 +871,7 @@ function runScan() {
     if (data.error) { showScanError('Erro API: ' + data.error.message); restoreScanUI(); return; }
     var text = data.content && data.content[0] && data.content[0].text;
     if (!text) { showScanError('Resposta vazia.'); restoreScanUI(); return; }
-    try {
-      var parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
-      applyAIData(parsed); goTo(1);
-    } catch(e) { showScanError('Erro ao interpretar IA.'); restoreScanUI(); }
+    try { var parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); applyAIData(parsed); goTo(1); } catch(e) { showScanError('Erro ao interpretar IA.'); restoreScanUI(); }
   }).catch(function(err) { document.getElementById('scan-overlay').style.display = 'none'; showScanError('Erro de ligação: ' + err.message); restoreScanUI(); });
 }
 function restoreScanUI() { document.getElementById('scan-zone').style.display = 'block'; document.getElementById('scan-btn').style.display = imageBase64 ? 'flex' : 'none'; if (imageBase64) document.getElementById('preview-img').style.display = 'block'; }
@@ -1084,16 +890,19 @@ function applyAIData(d) {
   function setChip(gid, val) { if(!val)return; var vals=Array.isArray(val)?val:[val]; vals.forEach(function(v){ if(!v||v==='null')return; document.getElementById(gid).querySelectorAll('.chip').forEach(function(c){ if(c.textContent.trim().toLowerCase()===v.toLowerCase()) c.classList.add('on','ai-filled'); }); }); }
   setChip('chips-tec', d.tecnica_anestesica); updateFarms();
   setChip('chips-dur', d.duracao); setChip('chips-va', d.abordagem_va); setChip('chips-va2', d.metodo_va);
-  setChip('chips-cent', d.neuroeixo); setChip('chips-bnp', d.bnp); setChip('chips-guia', d.orientacao_bnp);
+  setChip('chips-cent', d.neuroeixo); setChip('chips-bnp', d.bnp); setChip('chips-guia-bnp', d.orientacao_bnp);
   setChip('chips-mon', d.monitorizacao); setChip('chips-art', d.acesso_arterial); setChip('chips-cvc', d.cvc);
+  // Capturar também se a IA disse "Ecoguiada" nos acessos e colocar nos métodos apropriados:
+  setChip('chips-metodo-art', d.acesso_arterial); setChip('chips-metodo-cvc', d.cvc);
+  
   if(d.observacoes && d.observacoes!=='null') document.getElementById('f-obs').value=d.observacoes;
   
-  // Show autonomy blocks if needed
-  if(getChipsArray('chips-va').length) document.getElementById('aut-va').classList.remove('hidden');
-  if(getChipsArray('chips-cent').length) document.getElementById('aut-cent').classList.remove('hidden');
-  if(getChipsArray('chips-bnp').length) document.getElementById('aut-bnp').classList.remove('hidden');
-  if(getChipsArray('chips-art').length) document.getElementById('aut-art').classList.remove('hidden');
-  if(getChipsArray('chips-cvc').length) document.getElementById('aut-cvc').classList.remove('hidden');
+  // Show autonomy blocks if any selection was made
+  if(getChipsArray('chips-va').length) document.getElementById('aut-va-box').classList.remove('hidden');
+  if(getChipsArray('chips-cent').length) document.getElementById('aut-cent-box').classList.remove('hidden');
+  if(getChipsArray('chips-bnp').length) document.getElementById('aut-bnp-box').classList.remove('hidden');
+  if(getChipsArray('chips-art').length) document.getElementById('aut-art-box').classList.remove('hidden');
+  if(getChipsArray('chips-cvc').length) document.getElementById('aut-cvc-box').classList.remove('hidden');
 
   document.getElementById('ai-badge-s1').style.display = 'inline-flex';
   document.getElementById('ai-banner').classList.add('show');
@@ -1110,9 +919,11 @@ function buildReview() {
     ['Dados do Doente', 'NSC: ' + (document.getElementById('f-nsc').value||'—') + ' | ' + (document.getElementById('f-sexo').value||'—') + ' | ' + (document.getElementById('f-idade').value||'—') + 'a | ' + (document.getElementById('f-peso').value||'—') + 'kg'],
     ['ASA', document.getElementById('f-asa').value || '—'],
     ['Técnica', getChips('chips-tec')],
-    ['Via aérea', getChips('chips-va') + ' (' + getChips('aut-va') + ')'],
-    ['Neuro-eixo', getChips('chips-cent') + (getChips('chips-cent')!=='—' ? ' ('+getChips('aut-cent')+')':'')],
-    ['BNP', getChips('chips-bnp') + (getChips('chips-bnp')!=='—' ? ' ('+getChips('aut-bnp')+')':'')],
+    ['Via aérea', getChips('chips-va') + ' (' + getChips('chips-aut-va') + ')'],
+    ['Acessos CVC', getChips('chips-cvc') + (getChips('chips-cvc')!=='—' ? ' ['+getChips('chips-metodo-cvc')+'] ('+getChips('chips-aut-cvc')+')':'')],
+    ['Acessos Arterial', getChips('chips-art') + (getChips('chips-art')!=='—' ? ' ['+getChips('chips-metodo-art')+'] ('+getChips('chips-aut-art')+')':'')],
+    ['Neuro-eixo', getChips('chips-cent') + (getChips('chips-cent')!=='—' ? ' ('+getChips('chips-aut-cent')+')':'')],
+    ['BNP', getChips('chips-bnp') + (getChips('chips-bnp')!=='—' ? ' ['+getChips('chips-guia-bnp')+'] ('+getChips('chips-aut-bnp')+')':'')],
     ['Posicionamento', document.getElementById('f-posicao').value || '—'],
     ['Complicações', getChips('chips-complicacoes')]
   ];
@@ -1153,24 +964,27 @@ function collectData() {
     
     abord_va: getChips('chips-va'),
     metodo_va: getChips('chips-va2'),
-    autonomia_va: getChips('aut-va'),
+    autonomia_va: getChips('chips-aut-va'),
     vad_sim_nao: getChips('chips-vad-simnao'),
     vad_criterios: getChips('chips-vad-crit'),
     
     neuroeixo: getChips('chips-cent'),
-    autonomia_neuroeixo: getChips('aut-cent'),
+    autonomia_neuroeixo: getChips('chips-aut-cent'),
     bnp: getChips('chips-bnp'),
-    autonomia_bnp: getChips('aut-bnp'),
-    orientacao_bnp: getChips('chips-guia'),
+    autonomia_bnp: getChips('chips-aut-bnp'),
+    orientacao_bnp: getChips('chips-guia-bnp'),
     al_farmaco: getChips('chips-al-farmaco'),
     al_concentracao: getChips('chips-al-conc'),
     al_adjuvantes: getChips('chips-al-adjuv'),
     
     monitorizacao: getChips('chips-mon'),
     acesso_arterial: getChips('chips-art'),
-    autonomia_arterial: getChips('aut-art'),
+    metodo_arterial: getChips('chips-metodo-art'),
+    autonomia_arterial: getChips('chips-aut-art'),
     cvc: getChips('chips-cvc'),
-    autonomia_cvc: getChips('aut-cvc'),
+    metodo_cvc: getChips('chips-metodo-cvc'),
+    autonomia_cvc: getChips('chips-aut-cvc'),
+    
     exclusao_pulmonar: getChips('chips-exclusao'),
     sangue_fluidos: getChips('chips-sangue'),
     
@@ -1198,9 +1012,7 @@ function submitRecord() {
     fetch(gsUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
     .then(function() { okMsg.textContent = 'Guardado localmente e enviado para Google Sheets.'; })
     .catch(function() { okMsg.textContent = 'Guardado localmente. Verifica a ligação ao Google Sheets.'; });
-  } else {
-    okMsg.textContent = 'Guardado localmente. Configura o Google Sheets nas definições para sincronização automática.';
-  }
+  } else { okMsg.textContent = 'Guardado localmente. Configura o Google Sheets nas definições para sincronização automática.'; }
 }
 
 function newRecord() {
@@ -1222,9 +1034,7 @@ function newRecord() {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-var today = new Date().toISOString().split('T')[0];
-document.getElementById('f-data').value = today;
-loadSettings();
+var today = new Date().toISOString().split('T')[0]; document.getElementById('f-data').value = today; loadSettings();
 </script>
 
 <script>
