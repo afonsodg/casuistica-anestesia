@@ -749,9 +749,31 @@ function updateFarms() {
   }
 }
 function setTecnica(el) {
-  var gid = 'chips-tec'; var val = el.textContent.trim();
-  if (val === 'Combinada' || val === 'AG balanceada' || val === 'AG endovenosa (TIVA)' || val === 'AG inalatória') { solo(el, gid); } 
-  else { el.classList.toggle('on'); }
+  var gid = 'chips-tec'; 
+  var val = el.textContent.trim();
+  var isAG = (val === 'Combinada' || val === 'AG balanceada' || val === 'AG endovenosa (TIVA)' || val === 'AG inalatória');
+  
+  if (isAG) { 
+    solo(el, gid); 
+  } else {
+    var container = document.getElementById(gid);
+    // Limpa Anestesias Gerais se clicarmos apenas em Regional ou Sedação
+    container.querySelectorAll('.chip').forEach(function(c){
+      var t = c.textContent.trim();
+      if (t === 'Combinada' || t === 'AG balanceada' || t === 'AG endovenosa (TIVA)' || t === 'AG inalatória') {
+        c.classList.remove('on');
+      }
+    });
+    
+    // Torna Sedação e CAM mutuamente exclusivos
+    if (val === 'Sedação') {
+      container.querySelectorAll('.chip').forEach(function(c){ if(c.textContent.trim() === 'CAM') c.classList.remove('on'); });
+    } else if (val === 'CAM') {
+      container.querySelectorAll('.chip').forEach(function(c){ if(c.textContent.trim() === 'Sedação') c.classList.remove('on'); });
+    }
+    
+    el.classList.toggle('on');
+  }
   clearDrugs(); updateFarms();
 }
 
