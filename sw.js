@@ -1,5 +1,14 @@
-const CACHE = 'casuistica-v1';
-const ASSETS = ['/', '/index.html', '/manifest.json'];
+// 1. É OBRIGATÓRIO mudar o nome para v2 para o Safari apagar o cache antigo
+const CACHE = 'casuistica-v2'; 
+
+// 2. Usar caminhos relativos (./) para o SW entender que é dentro da pasta do projeto
+const ASSETS = [
+  './', 
+  './index.html', 
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
+];
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
@@ -22,10 +31,11 @@ self.addEventListener('activate', function(e) {
 });
 
 self.addEventListener('fetch', function(e) {
-  // For API calls, always go to network
+  // Ignorar chamadas de API (não colocar em cache)
   if (e.request.url.includes('anthropic.com') || e.request.url.includes('script.google.com')) {
     return;
   }
+  
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       return cached || fetch(e.request).then(function(response) {
@@ -34,7 +44,11 @@ self.addEventListener('fetch', function(e) {
         return response;
       });
     }).catch(function() {
-      return caches.match('/index.html');
+      // 3. Fallback corrigido para a pasta correta em vez da raiz absoluta
+      return caches.match('./index.html');
+    })
+  );
+});
     })
   );
 });
