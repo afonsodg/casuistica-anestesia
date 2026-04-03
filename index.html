@@ -1217,7 +1217,9 @@ loadSettings();
 <!-- PWA Service Worker registration -->
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(function() {});
+  navigator.serviceWorker.register('./sw.js').catch(function(err) {
+    console.log('Erro no Service Worker:', err);
+  });
 }
 </script>
 </body>
