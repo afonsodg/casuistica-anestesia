@@ -227,11 +227,11 @@
         <span class="field-label">Estágio</span>
         <select id="f-estagio" onchange="onEstagioChange()">
           <option value="">Selecionar...</option>
-          <optgroup label="2025"><option>Cirurgia Geral</option><option>Cirurgia Geral (HPV)</option><option>Urologia</option><option>Oftalmologia</option><option>UCPA</option><option>Ginecologia</option><option>Ortopedia</option></optgroup>
-          <optgroup label="2026"><option>Obstetrícia</option><option>Ambulatório</option><option>ORL</option><option>Dor Aguda</option><option>Cirurgia Plástica</option><option>AFBO</option></optgroup>
-          <optgroup label="2027"><option>Vascular</option><option>UCIP</option><option>Neurocirurgia</option></optgroup>
-          <optgroup label="2028"><option>Pediatria</option><option>Doente Crítico</option><option>U. Queimados</option><option>Dor Crónica</option></optgroup>
-          <optgroup label="2029"><option>HG1</option><option>Cardíaca</option><option>Torácica</option><option>Opcional</option></optgroup>
+          <optgroup label="2026"><option>Cirurgia Geral</option><option>Cirurgia Geral (HPV)</option><option>Urologia</option><option>Oftalmologia</option><option>UCPA</option><option>Ginecologia</option><option>Ortopedia</option></optgroup>
+          <optgroup label="2027"><option>Obstetrícia</option><option>Ambulatório</option><option>ORL</option><option>Dor Aguda</option><option>Cirurgia Plástica</option><option>AFBO</option></optgroup>
+          <optgroup label="2028"><option>Vascular</option><option>UCIP</option><option>Neurocirurgia</option></optgroup>
+          <optgroup label="2029"><option>Pediatria</option><option>Doente Crítico</option><option>U. Queimados</option><option>Dor Crónica</option></optgroup>
+          <optgroup label="2030"><option>HG1</option><option>Cardíaca</option><option>Torácica</option><option>Opcional</option></optgroup>
           <optgroup label="Transversal"><option>Urgência</option><option>ECDT</option></optgroup>
         </select>
       </div>
@@ -748,6 +748,7 @@ function updateFarms() {
     cardFarms.classList.remove('hidden'); grps[4].classList.remove('hidden');
   }
 }
+
 function setTecnica(el) {
   var gid = 'chips-tec'; 
   var val = el.textContent.trim();
@@ -757,7 +758,6 @@ function setTecnica(el) {
     solo(el, gid); 
   } else {
     var container = document.getElementById(gid);
-    // Limpa Anestesias Gerais se clicarmos apenas em Regional ou Sedação
     container.querySelectorAll('.chip').forEach(function(c){
       var t = c.textContent.trim();
       if (t === 'Combinada' || t === 'AG balanceada' || t === 'AG endovenosa (TIVA)' || t === 'AG inalatória') {
@@ -765,7 +765,6 @@ function setTecnica(el) {
       }
     });
     
-    // Torna Sedação e CAM mutuamente exclusivos
     if (val === 'Sedação') {
       container.querySelectorAll('.chip').forEach(function(c){ if(c.textContent.trim() === 'CAM') c.classList.remove('on'); });
     } else if (val === 'CAM') {
