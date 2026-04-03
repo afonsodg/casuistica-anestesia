@@ -2,6 +2,16 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
+
+<script>
+  if (!window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
+    window.history.replaceState(null, '', window.location.pathname + '/');
+  }
+</script>
+
+<base href="/casuistica-anestesia/">
+<link rel="canonical" href="https://TEU-USERNAME.github.io/casuistica-anestesia/">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
