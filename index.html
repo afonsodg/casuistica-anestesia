@@ -2830,9 +2830,9 @@ function openCaseDetail(origIdx, chronoNum) {
   var bnp = Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '');
   var monit = Array.isArray(r.monitorizacao) ? r.monitorizacao.join(', ') : (r.monitorizacao || '');
   var neuroeixo = Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || '');
-  var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.join(', ') : (r.sangue_fluidos || '');
-  var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.join(', ') : (r.acesso_arterial || '');
-  var cvc = Array.isArray(r.cvc) ? r.cvc.join(', ') : (r.cvc || '');
+  var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.sangue_fluidos === '—' ? '' : (r.sangue_fluidos || ''));
+  var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.acesso_arterial === '—' ? '' : (r.acesso_arterial || ''));
+  var cvc = Array.isArray(r.cvc) ? r.cvc.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.cvc === '—' ? '' : (r.cvc || ''));
   var compl = r.complicacoes || 'Nenhuma';
 
   function row(label, value) {
