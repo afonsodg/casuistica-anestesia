@@ -2436,8 +2436,9 @@ function editCase(origIdx) {
 
   // Preencher chips (activa os que estão no registo)
   function setChips(chipsId, value) {
-    if (!value) return;
-    var vals = value.split(' | ').map(function(v){ return v.trim(); });
+    if (!value || value === '\u2014') return;
+    // Suporta ' | ' (procedimentos) e ', ' (getChips)
+    var vals = value.split(/\s*\|\s*|,\s*/).map(function(v){ return v.trim(); }).filter(Boolean);
     var container = document.getElementById(chipsId);
     if (!container) return;
     container.querySelectorAll('.chip').forEach(function(chip) {
@@ -2491,6 +2492,31 @@ function editCase(origIdx) {
   onEstagioChange();
   updateFarms();
   checkExclusaoPulmonar();
+
+  // Restaurar autonomy-bars: mostrar se há dados guardados
+  function restoreBar(barId, hasData) {
+    if (hasData) {
+      var bar = document.getElementById(barId);
+      if (bar) bar.classList.remove('hidden');
+    }
+  }
+  // Via aérea
+  restoreBar('aut-va-box', r.autonomia_va || r.abord_va);
+  // Tubo OT
+  if (r.tubo_ot_tipo || r.tubo_ot_tamanho) {
+    var tuboWrap = document.getElementById('tubo-size-wrap');
+    if (tuboWrap) tuboWrap.classList.remove('hidden');
+  }
+  // Neuroeixo
+  restoreBar('aut-cent-box', r.autonomia_neuroeixo || r.neuroeixo);
+  // BNP
+  restoreBar('aut-bnp-box', r.autonomia_bnp || r.orientacao_bnp || r.bnp);
+  // Débito cardíaco
+  restoreBar('dc-box', r.dc_metodo);
+  // Linha arterial
+  restoreBar('aut-art-box', r.autonomia_arterial || r.metodo_arterial || r.acesso_arterial);
+  // CVC
+  restoreBar('aut-cvc-box', r.autonomia_cvc || r.metodo_cvc || r.cvc);
 
   // Ir para o passo 1 (contexto e doente)
   goTo(1);
