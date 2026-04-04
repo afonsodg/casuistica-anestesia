@@ -635,11 +635,11 @@
           <div class="chip" onclick="solo(this,'chips-tentativas')">5</div>
         </div>
       </div>
-      <div class="chip-wrap">
+      <div class="chip-wrap hidden" id="va2-wrap">
         <span class="sublabel">Método / Adicionais</span>
         <div class="chips" id="chips-va2">
-          <div class="chip freq" onclick="solo(this,'chips-va2')">Laringoscopia direta</div><div class="chip" onclick="solo(this,'chips-va2')">Videolaringoscopia</div>
-          <div class="chip" onclick="solo(this,'chips-va2')">Broncofibroscopia</div><div class="chip" onclick="solo(this,'chips-va2')">Lâmina McCoy</div>
+          <div class="chip freq" onclick="soloOrOff(this,'chips-va2')">Laringoscopia direta</div><div class="chip" onclick="soloOrOff(this,'chips-va2')">Videolaringoscopia</div>
+          <div class="chip" onclick="soloOrOff(this,'chips-va2')">Broncofibroscopia</div><div class="chip" onclick="soloOrOff(this,'chips-va2')">Lâmina McCoy</div>
           <div class="chip" onclick="toggle(this)">ISR</div><div class="chip" onclick="toggle(this)">Awake intubation</div>
         </div>
       </div>
@@ -1269,12 +1269,28 @@ function checkTuboSize() {
   var selected = Array.from(chips).find(function(c){ return c.classList.contains('on'); });
   var wrap = document.getElementById('tubo-size-wrap');
   var tentWrap = document.getElementById('tentativas-wrap');
-  if (selected && (selected.textContent === 'IOT' || selected.textContent === 'Nasotraqueal' || selected.textContent === 'Submentoniana')) {
+  var va2Wrap = document.getElementById('va2-wrap');
+
+  // Abordagens que NÃO usam método adicional
+  var NO_METHOD = ['Máscara laríngea', 'Máscara facial', 'Sem abordagem', 'Óculos nasais / O₂ suplementar', 'Ligação ao ventilador'];
+  var selText = selected ? selected.textContent.trim() : '';
+  var needsMethod = selected && NO_METHOD.indexOf(selText) === -1;
+
+  // Tubo e tentativas — só para IOT, Nasotraqueal, Submentoniana
+  if (selected && (selText === 'IOT' || selText === 'Nasotraqueal' || selText === 'Submentoniana')) {
     wrap.classList.remove('hidden');
     tentWrap.style.display = '';
   } else {
     wrap.classList.add('hidden');
     tentWrap.style.display = 'none';
+  }
+
+  // Método / Adicionais — ocultar e limpar chips se não aplicável
+  if (needsMethod) {
+    va2Wrap.classList.remove('hidden');
+  } else {
+    va2Wrap.classList.add('hidden');
+    document.getElementById('chips-va2').querySelectorAll('.chip.on').forEach(function(c){ c.classList.remove('on'); });
   }
 }
 
@@ -1360,6 +1376,7 @@ function checkPosicionamento() {
 
 // ─── LOGIC: CHIPS & AUTONOMY ──────────────────────────────────────────────────
 function solo(el, gid) { document.getElementById(gid).querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on','ai-filled'); }); el.classList.toggle('on'); }
+function soloOrOff(el, gid) { var wasOn = el.classList.contains('on'); document.getElementById(gid).querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on','ai-filled'); }); if (!wasOn) el.classList.add('on'); }
 function toggle(el) { el.classList.toggle('on'); }
 function removeNenhuma(gid) { var chips = document.getElementById(gid).querySelectorAll('.chip'); if (chips.length > 0) chips[0].classList.remove('on'); }
 
