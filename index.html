@@ -252,6 +252,14 @@
   .case-del-btn { width: 100%; padding: 14px; background: var(--red-light); border: 0.5px solid rgba(163,45,45,0.3); border-radius: 12px; color: var(--red); font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
   .case-del-btn svg { width: 16px; height: 16px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; }
   .case-del-btn:active { opacity: 0.7; }
+  .case-sync-btn { width: 100%; padding: 14px; background: var(--green-light); border: 0.5px solid var(--green-mid); border-radius: 12px; color: var(--green-dark); font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+  .case-sync-btn svg { width: 16px; height: 16px; stroke: var(--green-dark); fill: none; stroke-width: 2; stroke-linecap: round; }
+  .case-sync-btn:active { opacity: 0.7; }
+  .case-sync-btn.sending { opacity: 0.6; pointer-events: none; }
+  .case-sync-btn.sent { background: var(--green); border-color: var(--green); color: #fff; }
+  .case-sync-btn.sent svg { stroke: #fff; }
+  .case-sync-btn.error { background: var(--amber-light); border-color: #d4a017; color: #7a5800; }
+  .case-sync-btn.error svg { stroke: #7a5800; }
   .highlight { background: #fff3a3; border-radius: 2px; }
   @media (prefers-color-scheme: dark) { .highlight { background: #5a4a00; } }
 
@@ -2586,6 +2594,10 @@ function openCaseDetail(origIdx, chronoNum) {
     row('Complicações', compl),
     row('Observações', r.observacoes)
   ]) +
+  '<div class="case-sync-btn" id="case-sync-btn" onclick="syncCaseToSheets(' + origIdx + ')">' +
+    '<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>' +
+    '<span id="case-sync-label">Enviar para Google Sheets</span>' +
+  '</div>' +
   '<div class="case-del-btn" onclick="deleteCaseFromDetail(' + origIdx + ',\'' + escHtml(chronoNum+'') + '\')">' +
     '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
     'Apagar este caso' +
@@ -2741,6 +2753,33 @@ function editCase(origIdx) {
 
 function closeCaseDetail() {
   document.getElementById('case-overlay').classList.remove('show');
+}
+
+function syncCaseToSheets(origIdx) {
+  var gsUrl = getSetting('gsUrl');
+  var btn = document.getElementById('case-sync-btn');
+  var label = document.getElementById('case-sync-label');
+  if (!gsUrl || !gsUrl.startsWith('https://')) {
+    alert('URL do Google Sheets não configurado. Vai às Definições e introduz o URL do Apps Script.');
+    return;
+  }
+  var records = getRecords();
+  var r = records[origIdx];
+  if (!r) return;
+  btn.classList.add('sending');
+  label.textContent = 'A enviar...';
+  fetch(gsUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r) })
+  .then(function() {
+    btn.classList.remove('sending');
+    btn.classList.add('sent');
+    btn.querySelector('svg').innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+    label.textContent = 'Enviado com sucesso';
+  })
+  .catch(function() {
+    btn.classList.remove('sending');
+    btn.classList.add('error');
+    label.textContent = 'Erro ao enviar — tenta novamente';
+  });
 }
 
 function deleteCaseFromDetail(origIdx, num) {
