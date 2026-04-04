@@ -332,8 +332,8 @@
 <div class="app">
 
   <div class="topbar">
-    <div class="topbar-icon">
-      <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    <div class="topbar-icon" style="background:none;border-radius:8px;overflow:hidden;padding:0;">
+      <img src="icon-192.png" style="width:32px;height:32px;display:block;">
     </div>
     <div>
       <h1>Casuística</h1>
@@ -398,7 +398,7 @@
 
   <div class="content">
 
-  <div class="screen show" id="s0">
+  <div class="screen" id="s0">
     <div class="info-bar"><h2>Digitalizar relatório</h2><span class="step-num">Opcional</span></div>
     <div class="scan-zone" id="scan-zone">
       <input type="file" accept="image/*" capture="environment" id="file-input" onchange="onFileSelected(this)">
