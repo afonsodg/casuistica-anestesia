@@ -338,7 +338,9 @@
 <div class="app">
 
   <div class="topbar">
-    <div>
+    <div class="topbar-icon" style="background:none;border-radius:8px;overflow:hidden;padding:0;">
+      <img src="icon-192.png" style="width:32px;height:32px;display:block;">
+    </div>
     <div>
       <h1>Casuística</h1>
       <p>Internato Anestesiologia · ULS Santa Maria</p>
@@ -986,7 +988,7 @@
 <div class="settings-overlay" id="settings-overlay" onclick="closeSettings(event)">
   <div class="settings-panel">
     <div class="settings-handle"></div><h3>Configurações</h3>
-    <label>Chave API do Claude</label><input type="password" id="set-api-key" placeholder="sk-ant-..." oninput="saveSettings()">
+    <label>Chave API do Gemini (Scan IA)</label><input type="password" id="set-gemini-key" placeholder="AIza..." oninput="saveSettings()">
     <label>URL do Google Apps Script</label><input type="text" id="set-gs-url" placeholder="https://script.google.com/macros/s/..." oninput="saveSettings()">
     <label>Nome / identificação</label><input type="text" id="set-nome" placeholder="ex: Afonso Gonçalves" oninput="saveSettings()">
     
@@ -1129,14 +1131,14 @@ function calcIMC() {
 function loadSettings() {
   try {
     var s = JSON.parse(localStorage.getItem('cas-settings') || '{}');
-    if (s.apiKey) document.getElementById('set-api-key').value = s.apiKey;
+    if (s.geminiKey) document.getElementById('set-gemini-key').value = s.geminiKey;
     if (s.gsUrl) document.getElementById('set-gs-url').value = s.gsUrl;
     if (s.nome) document.getElementById('set-nome').value = s.nome;
   } catch(e) {}
 }
 function saveSettings() {
   try {
-    localStorage.setItem('cas-settings', JSON.stringify({ apiKey: document.getElementById('set-api-key').value, gsUrl: document.getElementById('set-gs-url').value, nome: document.getElementById('set-nome').value }));
+    localStorage.setItem('cas-settings', JSON.stringify({ geminiKey: document.getElementById('set-gemini-key').value, gsUrl: document.getElementById('set-gs-url').value, nome: document.getElementById('set-nome').value }));
   } catch(e) {}
 }
 function getSetting(k) { try { return JSON.parse(localStorage.getItem('cas-settings') || '{}')[k] || ''; } catch(e) { return ''; } }
@@ -1867,8 +1869,8 @@ function onFileSelected(input) {
 }
 
 function runScan() {
-  var key = getSetting('apiKey') || document.getElementById('set-api-key') && document.getElementById('set-api-key').value.trim();
-  if (!key) { showScanError('Introduz a chave API nas Configurações.'); openSettings(); return; }
+  var key = getSetting('geminiKey');
+  if (!key) { showScanError('Introduz a chave API do Gemini nas Configurações. Obtém uma gratuitamente em aistudio.google.com'); openSettings(); return; }
   if (!imageBase64) { showScanError('Seleciona uma imagem primeiro.'); return; }
 
   document.getElementById('scan-btn').style.display = 'none'; document.getElementById('scan-zone').style.display = 'none';
@@ -1876,17 +1878,32 @@ function runScan() {
 
   var prompt = 'Analisa este relatório anestésico / folha cirúrgica e extrai as informações em JSON estritamente válido, sem markdown, sem texto adicional:\n{"nsc":"numero do processo ou null", "sexo":"Masculino|Feminino|null", "idade":"numero ou null", "peso":"numero ou null", "altura":"numero ou null", "data":"YYYY-MM-DD ou null","estagio":"Cirurgia Geral|Cirurgia Geral (HPV)|Urologia|Oftalmologia|UCPA|Ginecologia|Ortopedia|Obstetrícia|Ambulatório|ORL|Dor Aguda|Cirurgia Plástica|AFBO|Vascular|UCIP|Neurocirurgia|Pediatria|Doente Crítico|U. Queimados|Dor Crónica|HG1|Cardíaca|Torácica|Urgência|ECDT|null","regime":"Programada – internamento|Programada – ambulatório|Urgência|null","procedimentos":["lista"],"asa":"I|II|III|IV|V|VI|null","tecnica_anestesica":"AG balanceada|AG endovenosa (TIVA)|AG inalatória|BSA (subaracnoideu)|Epidural|Sequencial|BNP isolado|Sedação|CAM|Combinada|null","duracao":"<60 min|1–3 h|>3 h|null","abordagem_va":"IOT|Nasotraqueal|Submentoniana|Máscara laríngea|Máscara facial|Sem abordagem|Ligação ao ventilador|Jet ventilation|null","metodo_va":"Laringoscopia direta|Videolaringoscopia|Broncofibroscopia|Awake intubation|Lâmina McCoy|N/A|null","neuroeixo":["Subaracnoideu|Epidural lombar|Epidural torácica|Sequencial|Nenhuma"],"bnp":["lista de BNPs"],"orientacao_bnp":"Ecoguiado|Neuroestimulação|Referências anatómicas|N/A|null","monitorizacao":["BIS|TOF|PAI|PVC|Débito urinário|Temp. central|PIC|Ecocardiografia|NIRS|Nenhuma"],"acesso_arterial":["Linha radial|Linha umeral|Linha femoral|Ecoguiada"],"cvc":["Jugular interno|Subclávia|Femoral|CVCTI|DVE|Ecoguiado"],"sangue_fluidos":["Cell-Saver","Transfusão UCEs","Transfusão PFC/Plaquetas"],"observacoes":"texto livre ou null"}\nSe não visível usa null ou []. Responde APENAS com o JSON.';
 
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } }, { type: 'text', text: prompt }]}] })
+  // Detectar media type da imagem
+  var mediaType = 'image/jpeg';
+  if (imageBase64.charAt(0) === 'i') mediaType = 'image/png';
+  else if (imageBase64.charAt(0) === 'R') mediaType = 'image/gif';
+  else if (imageBase64.charAt(0) === 'U') mediaType = 'image/webp';
+
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + key, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { inline_data: { mime_type: mediaType, data: imageBase64 } },
+          { text: prompt }
+        ]
+      }],
+      generationConfig: { temperature: 0, maxOutputTokens: 1500 }
+    })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
     document.getElementById('scan-overlay').style.display = 'none';
-    if (data.error) { showScanError('Erro API: ' + data.error.message); restoreScanUI(); return; }
-    var text = data.content && data.content[0] && data.content[0].text;
+    if (data.error) { showScanError('Erro Gemini: ' + data.error.message); restoreScanUI(); return; }
+    var text = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
     if (!text) { showScanError('Resposta vazia.'); restoreScanUI(); return; }
-    try { var parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); applyAIData(parsed); goTo(1); } catch(e) { showScanError('Erro ao interpretar IA.'); restoreScanUI(); }
+    try { var parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); applyAIData(parsed); goTo(1); } catch(e) { showScanError('Erro ao interpretar resposta da IA.'); restoreScanUI(); }
   }).catch(function(err) { document.getElementById('scan-overlay').style.display = 'none'; showScanError('Erro de ligação: ' + err.message); restoreScanUI(); });
 }
 function restoreScanUI() { document.getElementById('scan-zone').style.display = 'block'; document.getElementById('scan-btn').style.display = imageBase64 ? 'flex' : 'none'; if (imageBase64) document.getElementById('preview-img').style.display = 'block'; }
@@ -2032,6 +2049,13 @@ function submitRecord() {
 
   goTo(6);
   document.querySelectorAll('.step-pill').forEach(function(p){ p.classList.remove('active'); p.classList.add('done'); });
+
+  // Apagar imagem da memória imediatamente após submissão
+  imageBase64 = null;
+  var prevImg = document.getElementById('preview-img');
+  if (prevImg) { prevImg.src = ''; prevImg.style.display = 'none'; }
+  var fileInput = document.getElementById('file-input');
+  if (fileInput) { fileInput.value = ''; }
 
   try {
     var s = JSON.parse(localStorage.getItem('casuistica') || '[]');
