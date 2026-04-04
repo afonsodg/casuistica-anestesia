@@ -2510,7 +2510,7 @@ function renderStats() {
   var complMap = {};
   var complFunc = function(val) {
     if (!val || val === '—') return [];
-    return val.split(/,\s*|\s*\|\s*/).map(function(c){ return c.trim(); }).filter(function(c){ return c && c.toLowerCase() !== 'nenhuma' && c !== '—'; });
+    return val.split(/,\s*|\s*\|\s*/).map(function(c){ return c.trim(); }).filter(function(c){ return c && c !== '—' && c.toLowerCase() !== 'nenhuma complicação'; });
   };
   var complCount = records.filter(function(r){ return complFunc(r.complicacoes).length > 0; }).length;
   records.forEach(function(r){
