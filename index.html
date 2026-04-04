@@ -380,14 +380,14 @@
         <div id="diag-suggestions" style="display:flex;flex-wrap:wrap;gap:6px"></div>
       </div>
       <!-- Search bar -->
-      <div style="padding:6px 14px 10px;border-top:0.5px solid var(--gray-border);position:relative">
-        <div style="display:flex;align-items:center;gap:6px;background:var(--gray-bg);border:0.5px solid var(--gray-border-strong);border-radius:10px;padding:7px 11px">
+      <div style="padding:6px 14px 10px;border-top:0.5px solid var(--gray-border)">
+        <div id="diag-search-box" style="display:flex;align-items:center;gap:6px;background:var(--gray-bg);border:0.5px solid var(--gray-border-strong);border-radius:10px;padding:7px 11px">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" id="diag-search" placeholder="Pesquisar ou escrever diagnóstico..." autocomplete="off"
             style="flex:1;border:none;background:transparent;font-size:13px;color:var(--text);outline:none;font-family:inherit"
-            oninput="onDiagSearch()" onkeydown="onDiagSearchKey(event)">
+            oninput="onDiagSearch()" onkeydown="onDiagSearchKey(event)" onfocus="onDiagSearch()">
         </div>
-        <div id="diag-dropdown" style="display:none;position:absolute;left:14px;right:14px;top:calc(100% - 4px);background:var(--surface);border:0.5px solid var(--gray-border-strong);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:50;max-height:200px;overflow-y:auto"></div>
+        <div id="diag-dropdown" style="display:none;position:fixed;background:var(--surface);border:0.5px solid var(--gray-border-strong);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.18);z-index:999;max-height:220px;overflow-y:auto"></div>
       </div>
     </div>
     <div class="btn-bar"><button class="btn" onclick="goTo(0)" style="flex:0.45">← Scan</button><button class="btn btn-primary" onclick="goTo(2)">Continuar →</button></div>
@@ -1615,28 +1615,35 @@ function inferDiagnosis() {
 function onDiagSearch() {
   var q = (document.getElementById('diag-search').value || '').trim().toLowerCase();
   var dd = document.getElementById('diag-dropdown');
+  var box = document.getElementById('diag-search-box');
+
   if (!q) { hideDiagDropdown(); return; }
 
   var matches = DIAG_LIST.filter(function(d) {
     return d.toLowerCase().indexOf(q) !== -1;
   }).slice(0, 8);
 
-  // Also check custom entry
   var exactMatch = DIAG_LIST.find(function(d){ return d.toLowerCase() === q; });
 
   var html = matches.map(function(d) {
     var already = !!selectedDiags.find(function(s){ return s.name === d; });
-    return '<div onclick="addDiag(\'' + d.replace(/'/g,"&#39;") + '\')" style="padding:9px 14px;font-size:13px;border-bottom:0.5px solid var(--gray-border);cursor:pointer;color:' + (already ? 'var(--text-faint)' : 'var(--text)') + ';display:flex;align-items:center;justify-content:space-between" onmousedown="event.preventDefault()">'
-      + escHtml(d) + (already ? '<span style="font-size:11px;color:var(--green)">✓ adicionado</span>' : '') + '</div>';
+    return '<div onclick="addDiag(\'' + d.replace(/'/g,"&#39;") + '\')" style="padding:10px 14px;font-size:13px;border-bottom:0.5px solid var(--gray-border);cursor:pointer;color:' + (already ? 'var(--text-faint)' : 'var(--text)') + ';display:flex;align-items:center;justify-content:space-between;background:var(--surface)" onmousedown="event.preventDefault()">'
+      + escHtml(d) + (already ? '<span style="font-size:11px;color:var(--green)">✓</span>' : '') + '</div>';
   }).join('');
 
-  // Add "write manually" option if no exact match
   if (!exactMatch) {
     var raw = document.getElementById('diag-search').value.trim();
-    html += '<div onclick="addDiagCustom()" style="padding:9px 14px;font-size:13px;cursor:pointer;color:var(--blue);font-weight:500" onmousedown="event.preventDefault()">+ Adicionar "<span id=\'diag-custom-preview\'>' + escHtml(raw) + '</span>"</div>';
+    html += '<div onclick="addDiagCustom()" style="padding:10px 14px;font-size:13px;cursor:pointer;color:var(--blue);font-weight:500;background:var(--surface)" onmousedown="event.preventDefault()">+ Adicionar "' + escHtml(raw) + '"</div>';
   }
 
-  if (!html) { hideDiagDropdown(); return; }
+  if (!matches.length && exactMatch) { hideDiagDropdown(); return; }
+
+  // Position fixed relative to the search box
+  var rect = box.getBoundingClientRect();
+  dd.style.left = rect.left + 'px';
+  dd.style.width = rect.width + 'px';
+  dd.style.top = (rect.bottom + 4) + 'px';
+
   dd.innerHTML = html;
   dd.style.display = 'block';
 }
