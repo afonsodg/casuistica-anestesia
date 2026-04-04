@@ -858,9 +858,16 @@
     <label>URL do Google Apps Script</label><input type="text" id="set-gs-url" placeholder="https://script.google.com/macros/s/..." oninput="saveSettings()">
     <label>Nome / identificação</label><input type="text" id="set-nome" placeholder="ex: Afonso Gonçalves" oninput="saveSettings()">
     
-    <button class="btn btn-purple" onclick="exportToExcel()" style="width:100%; margin-bottom:14px; background-color: #534AB7; border-color: #534AB7; color: white;">
-      📥 Exportar Backup Local (Excel)
+    <button class="btn btn-purple" onclick="exportToExcel()" style="width:100%; margin-bottom:10px; background-color: #534AB7; border-color: #534AB7; color: white;">
+      📥 Exportar Backup Local (CSV)
     </button>
+
+    <label style="position:relative;display:block;margin-bottom:14px;">
+      <div class="btn" style="width:100%;text-align:center;cursor:pointer;background:var(--green-light);border-color:var(--green-mid);color:var(--green-dark);font-weight:600;">
+        📤 Importar Backup (CSV)
+      </div>
+      <input type="file" accept=".csv" onchange="importFromCSV(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
+    </label>
 
     <button class="btn btn-primary" onclick="closeSettings(null)" style="width:100%;margin-top:4px">Fechar</button>
   </div>
@@ -1732,6 +1739,88 @@ function exportToExcel() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+function importFromCSV(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var text = e.target.result;
+      // Remover BOM se presente
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      var lines = text.split(/\r?\n/).filter(function(l) { return l.trim() !== ''; });
+      if (lines.length < 2) { alert('Ficheiro CSV vazio ou inválido.'); return; }
+
+      // Parse cabeçalhos
+      var headers = lines[0].split(';').map(function(h) { return h.trim().replace(/^"|"$/g,''); });
+
+      // Parse linhas
+      var imported = [];
+      for (var i = 1; i < lines.length; i++) {
+        // Split respeitando campos com aspas e ponto-e-vírgula dentro
+        var cols = [];
+        var cur = '';
+        var inQ = false;
+        var line = lines[i];
+        for (var c = 0; c < line.length; c++) {
+          var ch = line[c];
+          if (ch === '"') {
+            if (inQ && line[c+1] === '"') { cur += '"'; c++; }
+            else inQ = !inQ;
+          } else if (ch === ';' && !inQ) {
+            cols.push(cur); cur = '';
+          } else {
+            cur += ch;
+          }
+        }
+        cols.push(cur);
+
+        var obj = {};
+        headers.forEach(function(h, idx) {
+          var val = cols[idx] !== undefined ? cols[idx] : '';
+          // Tentar restaurar arrays (procedimentos guardados como array)
+          if (val.startsWith('[') || val.startsWith('{')) {
+            try { val = JSON.parse(val); } catch(e2) {}
+          }
+          obj[h] = val;
+        });
+        imported.push(obj);
+      }
+
+      if (!imported.length) { alert('Nenhum registo encontrado no ficheiro.'); return; }
+
+      var existing = getRecords();
+      var msg = existing.length > 0
+        ? 'Encontrados ' + imported.length + ' registos no ficheiro.\n\nO que pretendes fazer?\n\nOK = Juntar ao histórico existente (' + existing.length + ' casos)\nCancelar = Substituir tudo (apaga os ' + existing.length + ' casos atuais)'
+        : 'Encontrados ' + imported.length + ' registos. Importar?';
+
+      if (existing.length > 0) {
+        var merge = confirm(msg);
+        if (merge) {
+          // Juntar, evitando duplicados por data+procedimentos
+          var combined = existing.concat(imported);
+          localStorage.setItem('casuistica', JSON.stringify(combined));
+          alert('✅ Importação concluída! ' + imported.length + ' registos adicionados. Total: ' + combined.length + ' casos.');
+        } else {
+          if (confirm('Tens a certeza que queres apagar os ' + existing.length + ' casos existentes e substituir pelo backup?')) {
+            localStorage.setItem('casuistica', JSON.stringify(imported));
+            alert('✅ Importação concluída! ' + imported.length + ' registos carregados.');
+          }
+        }
+      } else {
+        localStorage.setItem('casuistica', JSON.stringify(imported));
+        alert('✅ Importação concluída! ' + imported.length + ' registos carregados.');
+      }
+
+      input.value = '';
+      renderHistList();
+    } catch(err) {
+      alert('Erro ao ler o ficheiro: ' + err.message);
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
 }
 
 // ─── STATS ENGINE ─────────────────────────────────────────────────────────────
