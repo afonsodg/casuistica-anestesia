@@ -441,15 +441,20 @@
           <div class="chip" onclick="setTecnica(this)">Sedação</div>
           <div class="chip" onclick="setTecnica(this)">CAM</div>
           <div class="chip freq" onclick="setTecnica(this)">Combinada</div>
-          <div class="chip freq" onclick="setTecnica(this)">BSA (subaracnoideu)</div>
-          <div class="chip" onclick="setTecnica(this)">Epidural</div>
-          <div class="chip" onclick="setTecnica(this)">BNP isolado</div>
-          <div class="chip" onclick="setTecnica(this)">Sequencial</div>
+          <div class="chip freq" onclick="setTecnica(this)">Loco-regional</div>
         </div>
       </div>
       <div class="field-row hidden" id="row-comb-base">
         <span class="field-label">Base da Combinada</span>
         <select id="f-comb-base" onchange="updateFarms()"><option value="AG balanceada">AG balanceada</option><option value="AG endovenosa (TIVA)">AG endovenosa (TIVA)</option><option value="AG inalatória">AG inalatória</option></select>
+      </div>
+      <!-- Sedação associada a Loco-regional -->
+      <div class="chip-wrap hidden" id="row-lr-sedacao">
+        <span class="sublabel">Sedação associada?</span>
+        <div class="chips" id="chips-lr-sedacao">
+          <div class="chip" onclick="setLRSedacao(this, true)">Sim</div>
+          <div class="chip" onclick="setLRSedacao(this, false)">Não</div>
+        </div>
       </div>
       <div class="chip-wrap">
         <span class="sublabel">Duração</span>
@@ -1092,18 +1097,21 @@ function clearDrugs() { document.querySelectorAll('.drug-group .chip').forEach(f
 function updateFarms() {
   var techs = getChipsArray('chips-tec');
   var isComb = techs.indexOf('Combinada') !== -1;
+  var isLR = techs.indexOf('Loco-regional') !== -1;
   var rowComb = document.getElementById('row-comb-base');
-  
+  var rowLRSed = document.getElementById('row-lr-sedacao');
+
   if (isComb) rowComb.classList.remove('hidden'); else rowComb.classList.add('hidden');
+  if (isLR) rowLRSed.classList.remove('hidden'); else { rowLRSed.classList.add('hidden'); resetLRSedacao(); }
 
   var activeTec = isComb ? document.getElementById('f-comb-base').value : (techs.length ? techs[0] : '');
-  
+
   var cardFarms = document.getElementById('card-farmacos');
   var grps = [document.getElementById('grp-inducao-bal'), document.getElementById('grp-inducao-ina'), document.getElementById('grp-manutencao'), document.getElementById('grp-tiva'), document.getElementById('grp-sedacao'), document.getElementById('grp-bnm'), document.getElementById('grp-reversao')];
 
   grps.forEach(function(el){ el.classList.add('hidden'); });
   cardFarms.classList.add('hidden');
-  
+
   if (activeTec === 'AG balanceada') {
     cardFarms.classList.remove('hidden'); grps[0].classList.remove('hidden'); grps[2].classList.remove('hidden'); grps[5].classList.remove('hidden'); grps[6].classList.remove('hidden');
   } else if (activeTec === 'AG inalatória') {
@@ -1113,30 +1121,48 @@ function updateFarms() {
   } else if (techs.indexOf('Sedação') !== -1 || techs.indexOf('CAM') !== -1) {
     cardFarms.classList.remove('hidden'); grps[4].classList.remove('hidden');
   }
+  // Sedação associada a Loco-regional — mostrar fármacos se Sim estiver selecionado
+  if (isLR) {
+    var lrSedSim = document.getElementById('chips-lr-sedacao').querySelector('.chip.on');
+    if (lrSedSim && lrSedSim.textContent.trim() === 'Sim') {
+      cardFarms.classList.remove('hidden'); grps[4].classList.remove('hidden');
+    }
+  }
+}
+
+function setLRSedacao(el, hasSed) {
+  document.getElementById('chips-lr-sedacao').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+  updateFarms();
+}
+
+function resetLRSedacao() {
+  document.getElementById('chips-lr-sedacao').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
 }
 
 function setTecnica(el) {
-  var gid = 'chips-tec'; 
+  var gid = 'chips-tec';
   var val = el.textContent.trim();
   var isAG = (val === 'Combinada' || val === 'AG balanceada' || val === 'AG endovenosa (TIVA)' || val === 'AG inalatória');
-  
-  if (isAG) { 
-    solo(el, gid); 
+  var isSolo = isAG || val === 'Loco-regional';
+
+  if (isSolo) {
+    solo(el, gid);
   } else {
     var container = document.getElementById(gid);
     container.querySelectorAll('.chip').forEach(function(c){
       var t = c.textContent.trim();
-      if (t === 'Combinada' || t === 'AG balanceada' || t === 'AG endovenosa (TIVA)' || t === 'AG inalatória') {
+      if (t === 'Combinada' || t === 'AG balanceada' || t === 'AG endovenosa (TIVA)' || t === 'AG inalatória' || t === 'Loco-regional') {
         c.classList.remove('on');
       }
     });
-    
+
     if (val === 'Sedação') {
       container.querySelectorAll('.chip').forEach(function(c){ if(c.textContent.trim() === 'CAM') c.classList.remove('on'); });
     } else if (val === 'CAM') {
       container.querySelectorAll('.chip').forEach(function(c){ if(c.textContent.trim() === 'Sedação') c.classList.remove('on'); });
     }
-    
+
     el.classList.toggle('on');
   }
   clearDrugs(); updateFarms();
@@ -1855,6 +1881,7 @@ function collectData() {
     asa: document.getElementById('f-asa').value,
     
     tecnica_anest: tecFinal,
+    lr_sedacao: getChips('chips-lr-sedacao'),
     duracao: getChips('chips-dur'),
     farmacos_inducao_bal: getChips('chips-inducao'),
     farmacos_inducao_ina: getChips('chips-inducao-ina'),
@@ -2954,6 +2981,7 @@ function editCase(origIdx) {
     setChips('chips-tec', tecnicaRaw);
   }
   setChips('chips-dur', r.duracao);
+  setChips('chips-lr-sedacao', r.lr_sedacao);
   setChips('chips-inducao', r.farmacos_inducao_bal);
   setChips('chips-inducao-ina', r.farmacos_inducao_ina);
   setChips('chips-manutencao', r.farmacos_manutencao);
