@@ -252,6 +252,21 @@
   .case-del-btn:active { opacity: 0.7; }
   .highlight { background: #fff3a3; border-radius: 2px; }
   @media (prefers-color-scheme: dark) { .highlight { background: #5a4a00; } }
+
+  /* FILTROS HISTÓRICO */
+  .hist-filters { background: var(--surface); border-bottom: 0.5px solid var(--gray-border); padding: 8px 0 0; flex-shrink: 0; }
+  .hist-filter-row { display: flex; align-items: center; gap: 0; padding: 0 0 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .hist-filter-row::-webkit-scrollbar { display: none; }
+  .hist-filter-label { font-size: 10px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.4px; padding: 0 6px 0 14px; white-space: nowrap; flex-shrink: 0; }
+  .hist-filter-chips { display: flex; gap: 6px; padding-right: 14px; }
+  .hist-fchip { padding: 4px 11px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--gray-border-strong); background: var(--gray-bg); color: var(--text-muted); cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.12s; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .hist-fchip:active { transform: scale(0.96); }
+  .hist-fchip.on { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue-dark); font-weight: 600; }
+  .hist-fchip.on.tecnica { background: var(--purple-light); border-color: var(--purple); color: var(--purple-dark); }
+  .hist-active-filters { padding: 0 14px 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .hist-active-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-light); border: 0.5px solid var(--blue-mid); color: var(--blue-dark); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 500; cursor: pointer; }
+  .hist-active-tag.tecnica { background: var(--purple-light); border-color: var(--purple); color: var(--purple-dark); }
+  .hist-active-tag .x { font-size: 14px; opacity: 0.6; line-height: 1; }
 </style>
 </head>
 <body>
@@ -767,6 +782,17 @@
     </div>
     <div class="hist-count" id="hist-count"></div>
   </div>
+  <div class="hist-filters" id="hist-filters">
+    <div class="hist-filter-row">
+      <span class="hist-filter-label">Estágio</span>
+      <div class="hist-filter-chips" id="hist-filter-estagio"></div>
+    </div>
+    <div class="hist-filter-row">
+      <span class="hist-filter-label">Técnica</span>
+      <div class="hist-filter-chips" id="hist-filter-tecnica"></div>
+    </div>
+    <div class="hist-active-filters" id="hist-active-filters" style="display:none"></div>
+  </div>
   <div class="hist-list" id="hist-list"></div>
 </div>
 
@@ -832,16 +858,9 @@
     <label>URL do Google Apps Script</label><input type="text" id="set-gs-url" placeholder="https://script.google.com/macros/s/..." oninput="saveSettings()">
     <label>Nome / identificação</label><input type="text" id="set-nome" placeholder="ex: Afonso Gonçalves" oninput="saveSettings()">
     
-    <button class="btn btn-purple" onclick="exportToExcel()" style="width:100%; margin-bottom:10px; background-color: #534AB7; border-color: #534AB7; color: white;">
-      📥 Exportar Backup Local (CSV)
+    <button class="btn btn-purple" onclick="exportToExcel()" style="width:100%; margin-bottom:14px; background-color: #534AB7; border-color: #534AB7; color: white;">
+      📥 Exportar Backup Local (Excel)
     </button>
-
-    <label style="position:relative; display:block; margin-bottom:14px;">
-      <div class="btn" style="width:100%; background:#0F6E56; color:white; border-color:#0F6E56; font-size:15px; font-weight:600; padding:13px; border-radius:12px; text-align:center; cursor:pointer;">
-        📤 Importar CSV
-      </div>
-      <input type="file" accept=".csv" onchange="importFromCSV(this)" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
-    </label>
 
     <button class="btn btn-primary" onclick="closeSettings(null)" style="width:100%;margin-top:4px">Fechar</button>
   </div>
@@ -1715,86 +1734,7 @@ function exportToExcel() {
   document.body.removeChild(link);
 }
 
-// ─── IMPORT CSV ───────────────────────────────────────────────────────────────
-function importFromCSV(input) {
-  var file = input.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var text = e.target.result;
-      // Remove BOM if present
-      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-
-      var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
-      if (lines.length < 2) { alert('Ficheiro CSV vazio ou inválido.'); return; }
-
-      // Detect separator: ; or ,
-      var sep = lines[0].indexOf(';') !== -1 ? ';' : ',';
-
-      // Parse header
-      var headers = parseCSVLine(lines[0], sep);
-
-      // Parse rows
-      var imported = [];
-      for (var i = 1; i < lines.length; i++) {
-        var vals = parseCSVLine(lines[i], sep);
-        if (vals.length === 0) continue;
-        var obj = {};
-        headers.forEach(function(h, idx) {
-          var v = vals[idx] !== undefined ? vals[idx] : '';
-          // Try to restore arrays (fields that look like JSON arrays)
-          if (v.startsWith('[')) {
-            try { v = JSON.parse(v); } catch(e) {}
-          }
-          obj[h] = v;
-        });
-        imported.push(obj);
-      }
-
-      if (imported.length === 0) { alert('Nenhum registo encontrado no CSV.'); return; }
-
-      var existing = getRecords();
-      var msg = 'Foram encontrados ' + imported.length + ' registos no ficheiro.\n\n' +
-        'O que queres fazer?\n' +
-        '• OK = Adicionar aos ' + existing.length + ' registos existentes\n' +
-        '• Cancelar = Não importar';
-
-      if (!confirm(msg)) { input.value = ''; return; }
-
-      var merged = existing.concat(imported);
-      localStorage.setItem('casuistica', JSON.stringify(merged));
-      input.value = '';
-      closeSettings(null);
-      alert('✅ ' + imported.length + ' registos importados com sucesso! Total: ' + merged.length + ' casos.');
-    } catch(err) {
-      alert('Erro ao processar o ficheiro: ' + err.message);
-      input.value = '';
-    }
-  };
-  reader.readAsText(file, 'UTF-8');
-}
-
-function parseCSVLine(line, sep) {
-  var result = [];
-  var cur = '';
-  var inQuotes = false;
-  for (var i = 0; i < line.length; i++) {
-    var ch = line[i];
-    if (ch === '"') {
-      if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
-      else { inQuotes = !inQuotes; }
-    } else if (ch === sep && !inQuotes) {
-      result.push(cur); cur = '';
-    } else {
-      cur += ch;
-    }
-  }
-  result.push(cur);
-  return result;
-}
-
-
+// ─── STATS ENGINE ─────────────────────────────────────────────────────────────
 var currentStatTab = 'global';
 var currentEstagioFilter = null;
 
@@ -2099,10 +2039,59 @@ function selectEstagioFilter(estagio) {
 
 // ─── HISTÓRICO ────────────────────────────────────────────────────────────────
 
+// ─── FILTROS HISTÓRICO ────────────────────────────────────────────────────────
+var histFilterEstagio = null;
+var histFilterTecnica = null;
+
+function toggleHistFilter(type, value) {
+  if (type === 'estagio') histFilterEstagio = histFilterEstagio === value ? null : value;
+  else if (type === 'tecnica') histFilterTecnica = histFilterTecnica === value ? null : value;
+  renderHistList();
+}
+
+function clearHistFilter(type) {
+  if (type === 'estagio') histFilterEstagio = null;
+  else if (type === 'tecnica') histFilterTecnica = null;
+  renderHistList();
+}
+
+function buildHistFilterChips(records) {
+  // Estágios presentes nos registos
+  var estagioCount = {};
+  var tecnicaCount = {};
+  records.forEach(function(r) {
+    if (r.estagio) { estagioCount[r.estagio] = (estagioCount[r.estagio]||0)+1; }
+    if (r.tecnica_anestesica) { tecnicaCount[r.tecnica_anestesica] = (tecnicaCount[r.tecnica_anestesica]||0)+1; }
+  });
+
+  var estagioEl = document.getElementById('hist-filter-estagio');
+  var tecnicaEl = document.getElementById('hist-filter-tecnica');
+
+  estagioEl.innerHTML = Object.keys(estagioCount).sort().map(function(e) {
+    var on = histFilterEstagio === e ? ' on' : '';
+    return '<div class="hist-fchip' + on + '" onclick="toggleHistFilter(\'estagio\',\'' + e.replace(/'/g,"\\'") + '\')">' + escHtml(e) + ' <span style="opacity:0.55">(' + estagioCount[e] + ')</span></div>';
+  }).join('');
+
+  tecnicaEl.innerHTML = Object.keys(tecnicaCount).sort().map(function(t) {
+    var on = histFilterTecnica === t ? ' on tecnica' : '';
+    return '<div class="hist-fchip' + on + '" onclick="toggleHistFilter(\'tecnica\',\'' + t.replace(/'/g,"\\'") + '\')">' + escHtml(t) + ' <span style="opacity:0.55">(' + tecnicaCount[t] + ')</span></div>';
+  }).join('');
+
+  // Tags activas
+  var activeEl = document.getElementById('hist-active-filters');
+  var tags = [];
+  if (histFilterEstagio) tags.push('<div class="hist-active-tag" onclick="clearHistFilter(\'estagio\')">' + escHtml(histFilterEstagio) + ' <span class="x">×</span></div>');
+  if (histFilterTecnica) tags.push('<div class="hist-active-tag tecnica" onclick="clearHistFilter(\'tecnica\')">' + escHtml(histFilterTecnica) + ' <span class="x">×</span></div>');
+  if (tags.length) { activeEl.style.display = 'flex'; activeEl.innerHTML = tags.join(''); }
+  else { activeEl.style.display = 'none'; activeEl.innerHTML = ''; }
+}
+
 function openHist() {
   document.getElementById('hist-overlay').classList.add('show');
   document.getElementById('hist-btn').classList.add('stats-active');
   document.getElementById('hist-search-input').value = '';
+  histFilterEstagio = null;
+  histFilterTecnica = null;
   renderHistList();
 }
 
@@ -2115,6 +2104,8 @@ function renderHistList() {
   var records = getRecords();
   var q = (document.getElementById('hist-search-input').value || '').toLowerCase().trim();
 
+  buildHistFilterChips(records);
+
   // Ordenar por data desc e atribuir número cronológico
   var sorted = records.map(function(r, origIdx) { return { r: r, origIdx: origIdx }; });
   sorted.sort(function(a, b) { return (a.r.data || '').localeCompare(b.r.data || ''); });
@@ -2124,8 +2115,17 @@ function renderHistList() {
   sorted.reverse();
 
   var filtered = sorted;
+  // Filtro por estágio
+  if (histFilterEstagio) {
+    filtered = filtered.filter(function(item) { return item.r.estagio === histFilterEstagio; });
+  }
+  // Filtro por técnica
+  if (histFilterTecnica) {
+    filtered = filtered.filter(function(item) { return item.r.tecnica_anestesica === histFilterTecnica; });
+  }
+  // Filtro por texto
   if (q) {
-    filtered = sorted.filter(function(item) {
+    filtered = filtered.filter(function(item) {
       var r = item.r;
       var haystack = [
         r.diagnostico, r.estagio, r.procedimentos,
@@ -2136,8 +2136,9 @@ function renderHistList() {
     });
   }
 
+  var hasFilters = histFilterEstagio || histFilterTecnica || q;
   var countEl = document.getElementById('hist-count');
-  if (q) {
+  if (hasFilters) {
     countEl.textContent = filtered.length + ' resultado' + (filtered.length !== 1 ? 's' : '') + ' de ' + records.length + ' casos';
   } else {
     countEl.textContent = records.length + ' caso' + (records.length !== 1 ? 's' : '') + ' registado' + (records.length !== 1 ? 's' : '');
