@@ -233,6 +233,17 @@
   .hist-proc { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hist-meta { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
   .hist-tag { font-size: 10px; color: var(--text-faint); background: var(--gray-bg); border: 0.5px solid var(--gray-border); border-radius: 5px; padding: 2px 6px; }
+  .hist-tag.tec-ag-bal   { background:#E8F4FD; border-color:#5BA4D4; color:#1a5a8a; }
+  .hist-tag.tec-ag-tiva  { background:#EDE8FB; border-color:#7C6DD8; color:#3d2d99; }
+  .hist-tag.tec-ag-ina   { background:#E8F0FB; border-color:#6688CC; color:#2a4488; }
+  .hist-tag.tec-sed      { background:#FFF3E0; border-color:#E8A020; color:#7a4a00; }
+  .hist-tag.tec-cam      { background:#FFF8E0; border-color:#D4B800; color:#6a5200; }
+  .hist-tag.tec-comb     { background:#F0EBF8; border-color:#9B72CF; color:#4a2880; }
+  .hist-tag.tec-bsa      { background:#E8F5E9; border-color:#4CAF7A; color:#1b5e38; }
+  .hist-tag.tec-epi      { background:#E3F2E8; border-color:#3A9E6A; color:#1a5232; }
+  .hist-tag.tec-seq      { background:#EAF5EA; border-color:#56B07A; color:#1e5c36; }
+  .hist-tag.tec-bnp      { background:#FDE8F4; border-color:#CC6BAA; color:#7a1f58; }
+  .hist-tag.tec-outro    { background:var(--gray-bg); border-color:var(--gray-border-strong); color:var(--text-muted); }
   .hist-del-btn { width: 48px; display: flex; align-items: center; justify-content: center; background: var(--red-light); border-left: 0.5px solid var(--gray-border); cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
   .hist-del-btn:active { background: #f5c5c5; }
   .hist-del-btn svg { width: 16px; height: 16px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; }
@@ -2484,19 +2495,57 @@ function renderHistList() {
     var idade = r.idade ? r.idade + ' anos' : '';
     var sexo = r.sexo || '';
     var asa = r.asa ? 'ASA ' + r.asa : '';
-    var tecnica = r.tecnica_anest || '';
-    var locoRegional = [
-      Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || ''),
-      Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '')
-    ].filter(function(v){ return v && v !== '—'; }).join(' · ');
+    var tecnica = r.tecnica_anest || r.tecnica_anestesica || '';
+    var neuroeixoRaw = Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || '');
+    var bnpRaw = Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '');
 
     var diagHL = q ? hlText(diag, q) : escHtml(diag);
     var procsHL = q ? hlText(procs, q) : escHtml(procs);
 
-    var tags = [idade, sexo, asa, tecnica].filter(Boolean).map(function(t){
+    // Técnica anestésica — cor por tipo
+    function tecnicaClass(t) {
+      if (!t) return 'tec-outro';
+      var tl = t.toLowerCase();
+      if (tl.indexOf('balanceada') !== -1) return 'tec-ag-bal';
+      if (tl.indexOf('tiva') !== -1 || tl.indexOf('endovenosa') !== -1) return 'tec-ag-tiva';
+      if (tl.indexOf('inalatória') !== -1 || tl.indexOf('inalatoria') !== -1) return 'tec-ag-ina';
+      if (tl.indexOf('sedação') !== -1 || tl.indexOf('sedacao') !== -1) return 'tec-sed';
+      if (tl === 'cam') return 'tec-cam';
+      if (tl.indexOf('combinada') !== -1) return 'tec-comb';
+      if (tl.indexOf('subaracnoideu') !== -1 || tl.indexOf('bsa') !== -1) return 'tec-bsa';
+      if (tl.indexOf('epidural') !== -1) return 'tec-epi';
+      if (tl.indexOf('sequencial') !== -1) return 'tec-seq';
+      if (tl.indexOf('bnp') !== -1) return 'tec-bnp';
+      return 'tec-outro';
+    }
+
+    // Loco-regional — tag por tipo com cor própria
+    function locoTag(label, cls) {
+      return '<span class="hist-tag ' + cls + '">' + escHtml(label) + '</span>';
+    }
+    function buildLocoTags(neuro, bnp) {
+      var out = '';
+      if (neuro && neuro !== '—') {
+        var nl = neuro.toLowerCase();
+        var cls = 'tec-outro';
+        if (nl.indexOf('subaracnoideu') !== -1) cls = 'tec-bsa';
+        else if (nl.indexOf('sequencial') !== -1) cls = 'tec-seq';
+        else if (nl.indexOf('epidural') !== -1) cls = 'tec-epi';
+        out += locoTag(neuro, cls);
+      }
+      if (bnp && bnp !== '—') {
+        // cada BNP é separado por vírgula — mostrar só "BNP" ou lista curta
+        var bnpLabel = bnp.split(',').length > 2 ? 'BNP (' + bnp.split(',').length + ')' : bnp;
+        out += locoTag(bnpLabel, 'tec-bnp');
+      }
+      return out;
+    }
+
+    var tags = [idade, sexo, asa].filter(Boolean).map(function(t){
       return '<span class="hist-tag">' + escHtml(t) + '</span>';
     }).join('');
-    if (locoRegional) tags += '<span class="hist-tag" style="color:var(--purple-dark);border-color:var(--purple);background:var(--purple-light)">' + escHtml(locoRegional) + '</span>';
+    if (tecnica) tags += '<span class="hist-tag ' + tecnicaClass(tecnica) + '">' + escHtml(tecnica) + '</span>';
+    tags += buildLocoTags(neuroeixoRaw, bnpRaw);
 
     return '<div class="hist-item">' +
       '<div class="hist-item-body" onclick="openCaseDetail(' + idx + ',' + num + ')">' +
@@ -2578,8 +2627,7 @@ function openCaseDetail(origIdx, chronoNum) {
     row('Via aérea', r.abordagem_va),
     row('Método VA', r.metodo_va),
     row('Tubo OT', r.tubo_orotraqueal),
-    row('Técnica Loco-Regional', [neuroeixo, bnp].filter(function(v){ return v && v !== '—'; }).join(' · ')),
-    row('Orientação BNP', r.orientacao_bnp)
+    row('Técnica Loco-Regional', [neuroeixo, bnp].filter(function(v){ return v && v !== '—'; }).join(' · '))
   ]) +
   section('Monitorização & Acessos', [
     row('Monitorização', monit),
