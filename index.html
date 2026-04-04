@@ -309,6 +309,23 @@
   .edit-banner-label { font-size: 12px; font-weight: 600; color: var(--blue-dark); display: flex; align-items: center; gap: 6px; }
   .edit-banner-label svg { width: 14px; height: 14px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
   .edit-cancel-btn { font-size: 12px; font-weight: 600; color: var(--blue); background: var(--surface); border: 0.5px solid var(--blue-mid); border-radius: 8px; padding: 5px 12px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+
+  /* HOME SCREEN */
+  .home-screen { display: none; flex-direction: column; padding: 16px 16px calc(32px + var(--safe-bottom)); }
+  .home-screen.show { display: flex; }
+  .home-actions { display: flex; flex-direction: column; gap: 12px; }
+  .home-btn { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 14px; border: 0.5px solid var(--gray-border); background: var(--surface); cursor: pointer; text-align: left; width: 100%; transition: opacity 0.15s; }
+  .home-btn:active { opacity: 0.75; }
+  .home-btn-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .home-btn-icon svg { width: 22px; height: 22px; fill: none; stroke-width: 2; stroke-linecap: round; }
+  .home-btn-icon.purple { background: var(--purple-light); }
+  .home-btn-icon.purple svg { stroke: var(--purple); }
+  .home-btn-icon.blue { background: var(--blue-light); }
+  .home-btn-icon.blue svg { stroke: var(--blue); }
+  .home-btn-text h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .home-btn-text p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+  .home-btn-arrow { margin-left: auto; flex-shrink: 0; opacity: 0.3; }
+  .home-btn-arrow svg { width: 16px; height: 16px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; }
 </style>
 </head>
 <body>
@@ -344,7 +361,33 @@
     <button class="edit-cancel-btn" onclick="cancelEdit()">✕ Novo registo</button>
   </div>
 
-  <div class="progress-wrap">
+  <!-- HOME SCREEN -->
+  <div class="home-screen show" id="s-home">
+    <div class="home-actions">
+      <button class="home-btn" onclick="startScan()">
+        <div class="home-btn-icon purple">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="home-btn-text">
+          <h3>Scan de relatório</h3>
+          <p>Fotografa a folha anestésica e preenche automaticamente com IA</p>
+        </div>
+        <div class="home-btn-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </button>
+      <button class="home-btn" onclick="startManual()">
+        <div class="home-btn-icon blue">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="home-btn-text">
+          <h3>Novo registo manual</h3>
+          <p>Preenche o formulário passo a passo</p>
+        </div>
+        <div class="home-btn-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </button>
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap" style="display:none">
     <div class="step-pills">
       <div class="step-pill" id="p0"></div><div class="step-pill active" id="p1"></div>
       <div class="step-pill" id="p2"></div><div class="step-pill" id="p3"></div>
@@ -1091,8 +1134,29 @@ function openSettings() { document.getElementById('settings-overlay').classList.
 function closeSettings(e) { if (!e || e.target === document.getElementById('settings-overlay')) document.getElementById('settings-overlay').classList.remove('show'); }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function goHome() {
+  ['s0','s1','s2','s3','s4','s5','s-ok'].forEach(function(id){ var el = document.getElementById(id); if (el) el.classList.remove('show'); });
+  document.getElementById('s-home').classList.add('show');
+  document.getElementById('progress-wrap').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function startScan() {
+  document.getElementById('s-home').classList.remove('show');
+  document.getElementById('progress-wrap').style.display = '';
+  goTo(0);
+}
+
+function startManual() {
+  document.getElementById('s-home').classList.remove('show');
+  document.getElementById('progress-wrap').style.display = '';
+  goTo(1);
+}
+
 function goTo(n) {
   if (n === 5) { checkPosicionamento(); buildReview(); }
+  document.getElementById('s-home').classList.remove('show');
+  document.getElementById('progress-wrap').style.display = '';
   ['s0','s1','s2','s3','s4','s5','s-ok'].forEach(function(id){ var el = document.getElementById(id); if (el) el.classList.remove('show'); });
   var target = n <= 5 ? 's' + n : 's-ok';
   var el = document.getElementById(target); if (el) el.classList.add('show');
@@ -2021,7 +2085,7 @@ function newRecord() {
     if (c.textContent.trim() === 'Standard ASA') c.classList.add('on');
   });
 
-  setVAD(false); updateFarms(); checkExclusaoPulmonar(); goTo(0);
+  setVAD(false); updateFarms(); checkExclusaoPulmonar(); goHome();
 }
 
 function exportToExcel() {

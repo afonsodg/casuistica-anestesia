@@ -1,54 +1,75 @@
-// 1. É OBRIGATÓRIO mudar o nome para v2 para o Safari apagar o cache antigo
-const CACHE = 'casuistica-v2'; 
+// Incrementa a versão a cada deploy — o browser detecta a mudança e instala o novo SW
+const CACHE = 'casuistica-v3';
 
-// 2. Usar caminhos relativos (./) para o SW entender que é dentro da pasta do projeto
 const ASSETS = [
-  './', 
-  './index.html', 
+  './',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
 ];
 
+// INSTALL: pré-cachear assets estáticos
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE).then(function(cache) {
       return cache.addAll(ASSETS);
     })
   );
+  // Activar imediatamente sem esperar que tabs antigas fechem
   self.skipWaiting();
 });
 
+// ACTIVATE: apagar caches antigos
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
         keys.filter(function(k) { return k !== CACHE; }).map(function(k) { return caches.delete(k); })
       );
+    }).then(function() {
+      // Tomar controlo de todos os clientes imediatamente
+      return self.clients.claim();
     })
   );
-  self.clients.claim();
 });
 
+// FETCH: network-first com fallback para cache
+// Lógica: tenta sempre a rede primeiro → se falhar (offline) serve o cache
+// Vantagem: cada deploy é imediatamente servido sem apagar a app
 self.addEventListener('fetch', function(e) {
-  // Ignorar chamadas de API (não colocar em cache)
-  if (e.request.url.includes('anthropic.com') || e.request.url.includes('script.google.com')) {
+  var url = e.request.url;
+
+  // Nunca interceptar chamadas de API externas
+  if (url.includes('anthropic.com') || url.includes('script.google.com')) {
     return;
   }
-  
+
+  // Só interceptar GET
+  if (e.request.method !== 'GET') return;
+
   e.respondWith(
-    caches.match(e.request).then(function(cached) {
-      return cached || fetch(e.request).then(function(response) {
+    fetch(e.request).then(function(response) {
+      // Resposta válida da rede — actualizar o cache em background
+      if (response && response.status === 200) {
         var clone = response.clone();
-        caches.open(CACHE).then(function(cache) { cache.put(e.request, clone); });
-        return response;
-      });
+        caches.open(CACHE).then(function(cache) {
+          cache.put(e.request, clone);
+        });
+      }
+      return response;
     }).catch(function() {
-      // 3. Fallback corrigido para a pasta correta em vez da raiz absoluta
-      return caches.match('./index.html');
+      // Sem rede — servir do cache
+      return caches.match(e.request).then(function(cached) {
+        return cached || caches.match('./index.html');
+      });
     })
   );
 });
-    })
-  );
+
+// Notificar clientes quando há uma nova versão disponível
+self.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
