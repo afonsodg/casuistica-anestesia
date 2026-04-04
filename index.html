@@ -803,7 +803,9 @@
       <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
     </div>
     <h2 id="case-title">Caso</h2>
-    <div style="width:32px;flex-shrink:0"></div>
+    <div class="icon-btn" id="case-edit-btn" title="Editar caso" style="background:var(--blue-light);border-color:var(--blue-mid)">
+      <svg viewBox="0 0 24 24" style="stroke:var(--blue)"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </div>
   </div>
   <div class="case-body" id="case-body"></div>
 </div>
@@ -1666,17 +1668,33 @@ function submitRecord() {
   goTo(6);
   document.querySelectorAll('.step-pill').forEach(function(p){ p.classList.remove('active'); p.classList.add('done'); });
 
-  try { var s = JSON.parse(localStorage.getItem('casuistica') || '[]'); s.push(data); localStorage.setItem('casuistica', JSON.stringify(s)); } catch(e) {}
+  try {
+    var s = JSON.parse(localStorage.getItem('casuistica') || '[]');
+    if (editingIdx !== null && editingIdx >= 0 && editingIdx < s.length) {
+      s[editingIdx] = data;
+      okMsg.textContent = 'Registo atualizado com sucesso.';
+      editingIdx = null;
+    } else {
+      s.push(data);
+      okMsg.textContent = 'Guardado localmente. Configura o Google Sheets nas definições para sincronização automática.';
+    }
+    localStorage.setItem('casuistica', JSON.stringify(s));
+  } catch(e) {}
+
+  // Repor botão de guardar
+  var btn = document.querySelector('#s5 .btn-success');
+  if (btn) { btn.textContent = 'Guardar registo'; btn.style.background = ''; btn.style.borderColor = ''; }
 
   if (gsUrl && gsUrl.startsWith('https://')) {
     okMsg.textContent = 'A enviar para Google Sheets...';
     fetch(gsUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-    .then(function() { okMsg.textContent = 'Guardado localmente e enviado para Google Sheets.'; })
+    .then(function() { okMsg.textContent = 'Guardado e enviado para Google Sheets.'; })
     .catch(function() { okMsg.textContent = 'Guardado localmente. Verifica a ligação ao Google Sheets.'; });
-  } else { okMsg.textContent = 'Guardado localmente. Configura o Google Sheets nas definições para sincronização automática.'; }
+  }
 }
 
 function newRecord() {
+  editingIdx = null;
   selectedProcs = []; aiProcs = []; imageBase64 = null; renderSelected();
   document.getElementById('proc-lists').innerHTML = '';
   document.getElementById('f-data').value = today;
@@ -2294,6 +2312,7 @@ function openCaseDetail(origIdx, chronoNum) {
   if (!r) return;
 
   document.getElementById('case-title').textContent = 'Caso #' + chronoNum;
+  document.getElementById('case-edit-btn').onclick = function() { editCase(origIdx); };
 
   var dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
   var procs = Array.isArray(r.procedimentos) ? r.procedimentos.join(', ') : (r.procedimentos || '—');
@@ -2368,6 +2387,117 @@ function openCaseDetail(origIdx, chronoNum) {
 
   document.getElementById('case-body').innerHTML = html;
   document.getElementById('case-overlay').classList.add('show');
+}
+
+var editingIdx = null;
+
+function editCase(origIdx) {
+  var records = getRecords();
+  var r = records[origIdx];
+  if (!r) return;
+
+  // Primeiro limpar tudo como num novo registo
+  newRecord();
+
+  // Guardar o índice para substituir em vez de criar
+  editingIdx = origIdx;
+
+  // Fechar overlays
+  closeCaseDetail();
+  closeHist();
+
+  // Preencher campos de texto e selects
+  function setVal(id, val) { var el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; }
+  setVal('f-nsc', r.nsc);
+  setVal('f-sexo', r.sexo);
+  setVal('f-idade', r.idade);
+  setVal('f-peso', r.peso);
+  setVal('f-altura', r.altura);
+  setVal('f-data', r.data);
+  setVal('f-estagio', r.estagio);
+  setVal('f-diagnostico', r.diagnostico);
+  setVal('f-obs', r.observacoes);
+  setVal('f-posicao', r.posicionamento);
+  setVal('f-destino', r.destino);
+  setVal('f-tubo-size', r.tubo_ot_tamanho);
+  setVal('f-vol-neuroeixo', r.vol_al_neuroeixo);
+  setVal('f-vol-bnp', r.vol_al_bnp);
+
+  // ASA
+  var asaEl = document.getElementById('f-asa');
+  if (asaEl && r.asa) asaEl.value = r.asa;
+
+  // Regime
+  var regimeEl = document.getElementById('f-regime');
+  if (regimeEl && r.regime) regimeEl.value = r.regime;
+
+  // Recalcular IMC
+  calcIMC();
+
+  // Preencher chips (activa os que estão no registo)
+  function setChips(chipsId, value) {
+    if (!value) return;
+    var vals = value.split(' | ').map(function(v){ return v.trim(); });
+    var container = document.getElementById(chipsId);
+    if (!container) return;
+    container.querySelectorAll('.chip').forEach(function(chip) {
+      if (vals.indexOf(chip.textContent.trim()) !== -1) chip.classList.add('on');
+    });
+  }
+
+  setChips('chips-tec', r.tecnica_anest);
+  setChips('chips-dur', r.duracao);
+  setChips('chips-inducao', r.farmacos_inducao_bal);
+  setChips('chips-inducao-ina', r.farmacos_inducao_ina);
+  setChips('chips-manutencao', r.farmacos_manutencao);
+  setChips('chips-tiva', r.tiva_modelos);
+  setChips('chips-sedacao', r.farmacos_sedacao);
+  setChips('chips-bnm', r.bnm);
+  setChips('chips-reversao', r.reversao);
+  setChips('chips-va', r.abord_va);
+  setChips('chips-va2', r.metodo_va);
+  setChips('chips-aut-va', r.autonomia_va);
+  setChips('chips-tubo-tipo', r.tubo_ot_tipo);
+  setChips('chips-tentativas', r.tentativas_intubacao);
+  setChips('chips-vad-simnao', r.vad_sim_nao);
+  setChips('chips-vad-crit', r.vad_criterios);
+  setChips('chips-cent', r.neuroeixo);
+  setChips('chips-aut-cent', r.autonomia_neuroeixo);
+  setChips('chips-bnp', r.bnp);
+  setChips('chips-aut-bnp', r.autonomia_bnp);
+  setChips('chips-guia-bnp', r.orientacao_bnp);
+  setChips('chips-al-farmaco', r.al_farmaco);
+  setChips('chips-al-conc', r.al_concentracao);
+  setChips('chips-al-adjuv', r.al_adjuvantes);
+  setChips('chips-mon', r.monitorizacao);
+  setChips('chips-dc-metodo', r.dc_metodo);
+  setChips('chips-art', r.acesso_arterial);
+  setChips('chips-metodo-art', r.metodo_arterial);
+  setChips('chips-aut-art', r.autonomia_arterial);
+  setChips('chips-cvc', r.cvc);
+  setChips('chips-metodo-cvc', r.metodo_cvc);
+  setChips('chips-aut-cvc', r.autonomia_cvc);
+  setChips('chips-exclusao', r.exclusao_pulmonar);
+  setChips('chips-complicacoes', r.complicacoes);
+  setChips('chips-participacao', r.participacao_global);
+
+  // Procedimentos
+  if (r.procedimentos) {
+    selectedProcs = r.procedimentos.split(' | ').map(function(p){ return p.trim(); }).filter(Boolean);
+    renderSelected();
+  }
+
+  // Actualizar visibilidade de secções dependentes
+  onEstagioChange();
+  updateFarms();
+  checkExclusaoPulmonar();
+
+  // Ir para o passo 1 (contexto e doente)
+  goTo(1);
+
+  // Indicador visual de modo edição
+  var btn = document.querySelector('#s5 .btn-success');
+  if (btn) { btn.textContent = 'Guardar alterações'; btn.style.background = 'var(--blue)'; btn.style.borderColor = 'var(--blue)'; }
 }
 
 function closeCaseDetail() {
