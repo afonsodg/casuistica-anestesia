@@ -1787,12 +1787,11 @@ function buildReview() {
     ['Diagnóstico', getDiagString() || '—'],
     ['Dados do Doente', 'NSC: ' + (document.getElementById('f-nsc').value||'—') + ' | ' + (document.getElementById('f-sexo').value||'—') + ' | ' + (document.getElementById('f-idade').value||'—') + 'a | ' + (document.getElementById('f-peso').value||'—') + 'kg'],
     ['ASA', document.getElementById('f-asa').value || '—'],
-    ['Técnica', getChips('chips-tec')],
+    ['Técnica Anestésica', getChips('chips-tec')],
     ['Via aérea', getChips('chips-va') + ' (' + getChips('chips-aut-va') + ')'],
     ['Acessos CVC', getChips('chips-cvc') + (getChips('chips-cvc')!=='—' ? ' ['+getChips('chips-metodo-cvc')+'] ('+getChips('chips-aut-cvc')+')':'')],
     ['Acessos Arterial', getChips('chips-art') + (getChips('chips-art')!=='—' ? ' ['+getChips('chips-metodo-art')+'] ('+getChips('chips-aut-art')+')':'')],
-    ['Neuro-eixo', getChips('chips-cent') + (getChips('chips-cent')!=='—' ? ' ('+getChips('chips-aut-cent')+')':'')],
-    ['BNP', getChips('chips-bnp') + (getChips('chips-bnp')!=='—' ? ' ['+getChips('chips-guia-bnp')+'] ('+getChips('chips-aut-bnp')+')':'')],
+    ['Técnica Loco-Regional', getChips('chips-cent') + (getChips('chips-cent')!=='—' ? ' ('+getChips('chips-aut-cent')+')':'') + (getChips('chips-bnp')!=='—' ? ' · BNP: '+getChips('chips-bnp'):'')],
     ['Posicionamento', document.getElementById('f-posicao').value || '—'],
     ['Fluidos e Sangue', getSangueFluidos()],
     ['Complicações', getChips('chips-complicacoes')]
@@ -2382,7 +2381,7 @@ function buildHistFilterChips(records) {
   var tecnicaCount = {};
   records.forEach(function(r) {
     if (r.estagio) { estagioCount[r.estagio] = (estagioCount[r.estagio]||0)+1; }
-    if (r.tecnica_anestesica) { tecnicaCount[r.tecnica_anestesica] = (tecnicaCount[r.tecnica_anestesica]||0)+1; }
+    if (r.tecnica_anest || r.tecnica_anestesica) { tecnicaCount[r.tecnica_anest || r.tecnica_anestesica] = (tecnicaCount[r.tecnica_anest || r.tecnica_anestesica]||0)+1; }
   });
 
   var estagioEl = document.getElementById('hist-filter-estagio');
@@ -2442,7 +2441,7 @@ function renderHistList() {
   }
   // Filtro por técnica
   if (histFilterTecnica) {
-    filtered = filtered.filter(function(item) { return item.r.tecnica_anestesica === histFilterTecnica; });
+    filtered = filtered.filter(function(item) { return item.r.tecnica_anest || r.tecnica_anestesica === histFilterTecnica; });
   }
   // Filtro por texto
   if (q) {
@@ -2450,7 +2449,7 @@ function renderHistList() {
       var r = item.r;
       var haystack = [
         r.diagnostico, r.estagio, r.procedimentos,
-        r.tecnica_anestesica, r.abordagem_va, r.observacoes,
+        r.tecnica_anest || r.tecnica_anestesica, r.abordagem_va, r.observacoes,
         r.asa ? 'ASA ' + r.asa : '', r.data
       ].join(' ').toLowerCase();
       return haystack.indexOf(q) !== -1;
@@ -2485,7 +2484,11 @@ function renderHistList() {
     var idade = r.idade ? r.idade + ' anos' : '';
     var sexo = r.sexo || '';
     var asa = r.asa ? 'ASA ' + r.asa : '';
-    var tecnica = r.tecnica_anestesica || '';
+    var tecnica = r.tecnica_anest || '';
+    var locoRegional = [
+      Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || ''),
+      Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '')
+    ].filter(function(v){ return v && v !== '—'; }).join(' · ');
 
     var diagHL = q ? hlText(diag, q) : escHtml(diag);
     var procsHL = q ? hlText(procs, q) : escHtml(procs);
@@ -2493,6 +2496,7 @@ function renderHistList() {
     var tags = [idade, sexo, asa, tecnica].filter(Boolean).map(function(t){
       return '<span class="hist-tag">' + escHtml(t) + '</span>';
     }).join('');
+    if (locoRegional) tags += '<span class="hist-tag" style="color:var(--purple-dark);border-color:var(--purple);background:var(--purple-light)">' + escHtml(locoRegional) + '</span>';
 
     return '<div class="hist-item">' +
       '<div class="hist-item-body" onclick="openCaseDetail(' + idx + ',' + num + ')">' +
@@ -2570,12 +2574,11 @@ function openCaseDetail(origIdx, chronoNum) {
     row('Destino pós-op', r.destino_pos_op)
   ]) +
   section('Técnica Anestésica', [
-    row('Técnica', r.tecnica_anestesica),
+    row('Técnica Anestésica', r.tecnica_anest || r.tecnica_anest || r.tecnica_anestesica),
     row('Via aérea', r.abordagem_va),
     row('Método VA', r.metodo_va),
     row('Tubo OT', r.tubo_orotraqueal),
-    row('Neuroeixo', neuroeixo),
-    row('BNP', bnp),
+    row('Técnica Loco-Regional', [neuroeixo, bnp].filter(function(v){ return v && v !== '—'; }).join(' · ')),
     row('Orientação BNP', r.orientacao_bnp)
   ]) +
   section('Monitorização & Acessos', [
