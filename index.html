@@ -2500,13 +2500,7 @@ function renderStats() {
 
   // ── GLOBAL TAB ──
   var vad = records.filter(function(r){return (r.vad_sim_nao||'').indexOf('Sim')!==-1;}).length;
-  var compl = records.filter(function(r){return r.complicacoes && r.complicacoes.replace(/Nenhuma/gi,'').trim() !== '';}).length;
   var estagios = Object.keys(count(records,'estagio')).length;
-  document.getElementById('kpi-global').innerHTML =
-    '<div class="kpi-card"><div class="kpi-num">' + records.length + '</div><div class="kpi-label">Total de casos</div></div>' +
-    '<div class="kpi-card green"><div class="kpi-num">' + estagios + '</div><div class="kpi-label">Estágios com registos</div></div>' +
-    '<div class="kpi-card red"><div class="kpi-num">' + vad + '</div><div class="kpi-label">VAD registadas</div></div>' +
-    '<div class="kpi-card purple"><div class="kpi-num">' + compl + '</div><div class="kpi-label">Com complicações</div></div>';
 
   renderDonut('chart-tecnica', 'Técnica Anestésica', count(records,'tecnica_anest'), PALETTE);
   renderDonut('chart-asa', 'Distribuição ASA', count(records,'asa'), ['#0F6E56','#378ADD','#185FA5','#534AB7','#A32D2D','#6b3fa0']);
@@ -2514,9 +2508,19 @@ function renderStats() {
 
   // Complicações
   var complMap = {};
+  var complFunc = function(val) {
+    if (!val || val === '—') return [];
+    return val.split(/,\s*|\s*\|\s*/).map(function(c){ return c.trim(); }).filter(function(c){ return c && c.toLowerCase() !== 'nenhuma' && c !== '—'; });
+  };
+  var complCount = records.filter(function(r){ return complFunc(r.complicacoes).length > 0; }).length;
   records.forEach(function(r){
-    (r.complicacoes||'').split(' | ').forEach(function(c){ c = c.trim(); if(c && c.toLowerCase()!=='nenhuma'){if(!complMap[c])complMap[c]=0;complMap[c]++;} });
+    complFunc(r.complicacoes).forEach(function(c){ if(!complMap[c]) complMap[c]=0; complMap[c]++; });
   });
+  document.getElementById('kpi-global').innerHTML =
+    '<div class="kpi-card"><div class="kpi-num">' + records.length + '</div><div class="kpi-label">Total de casos</div></div>' +
+    '<div class="kpi-card green"><div class="kpi-num">' + estagios + '</div><div class="kpi-label">Estágios com registos</div></div>' +
+    '<div class="kpi-card red"><div class="kpi-num">' + vad + '</div><div class="kpi-label">VAD registadas</div></div>' +
+    '<div class="kpi-card purple"><div class="kpi-num">' + complCount + '</div><div class="kpi-label">Com complicações</div></div>';
   renderBarChart('chart-complicacoes', 'Complicações registadas', topN(complMap,8), '#A32D2D');
 
   // ── ESTÁGIO TAB ──
