@@ -2669,7 +2669,7 @@ function renderHistList() {
   }
   // Filtro por técnica
   if (histFilterTecnica) {
-    filtered = filtered.filter(function(item) { return item.r.tecnica_anest || r.tecnica_anestesica === histFilterTecnica; });
+    filtered = filtered.filter(function(item) { return (item.r.tecnica_anest || item.r.tecnica_anestesica) === histFilterTecnica; });
   }
   // Filtro por texto
   if (q) {
