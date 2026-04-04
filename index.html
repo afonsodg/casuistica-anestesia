@@ -2850,8 +2850,8 @@ function openCaseDetail(origIdx, chronoNum) {
   var dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
   var procs = Array.isArray(r.procedimentos) ? r.procedimentos.join(', ') : (r.procedimentos || '—');
   var bnp = Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '');
-  var monit = Array.isArray(r.monitorizacao) ? r.monitorizacao.join(', ') : (r.monitorizacao || '');
-  var neuroeixo = Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || '');
+  var monit = Array.isArray(r.monitorizacao) ? r.monitorizacao.join(', ') : (r.monitorizacao === '—' ? '' : (r.monitorizacao || ''));
+  var neuroeixo = Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo === '—' ? '' : (r.neuroeixo || ''));
   var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.sangue_fluidos === '—' ? '' : (r.sangue_fluidos || ''));
   var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.acesso_arterial === '—' ? '' : (r.acesso_arterial || ''));
   var cvc = Array.isArray(r.cvc) ? r.cvc.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.cvc === '—' ? '' : (r.cvc || ''));
@@ -2902,10 +2902,10 @@ function openCaseDetail(origIdx, chronoNum) {
     row('Sangue / Fluidos', sangue)
   ]) +
   section('Autonomia', [
-    row('Via aérea', r.autonomia_va),
-    row('Neuroeixo', r.autonomia_neuroeixo),
-    row('BNP', r.autonomia_bnp),
-    row('Geral', r.autonomia_geral)
+    row('Via aérea', r.autonomia_va === '—' ? '' : r.autonomia_va),
+    row('Neuroeixo', r.autonomia_neuroeixo === '—' ? '' : r.autonomia_neuroeixo),
+    row('BNP', r.autonomia_bnp === '—' ? '' : r.autonomia_bnp),
+    row('Geral', r.autonomia_geral === '—' ? '' : r.autonomia_geral)
   ]) +
   section('Complicações & Notas', [
     row('Complicações', compl),
