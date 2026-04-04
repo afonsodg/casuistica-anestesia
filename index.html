@@ -367,14 +367,27 @@
 
     <div class="card" id="diag-card">
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
-        <span>Diagnóstico</span>
+        <span>Diagnóstico(s)</span>
         <span id="diag-ai-badge" style="display:none" class="ai-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Inferido</span>
       </div>
-      <div style="padding:8px 14px 4px">
-        <div id="diag-suggestions" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:0"></div>
+      <!-- Selected diagnoses tags -->
+      <div style="padding:8px 14px 6px">
+        <div id="diag-selected" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;margin-bottom:4px"></div>
       </div>
-      <div class="field-row" style="border-top:0.5px solid var(--gray-border)">
-        <input type="text" id="f-diagnostico" placeholder="Confirmar ou escrever diagnóstico..." style="flex:1;text-align:left;font-size:14px;">
+      <!-- AI suggestions -->
+      <div style="padding:0 14px 6px;display:none" id="diag-sugg-wrap">
+        <span class="sublabel" style="margin-bottom:5px">Sugestões IA</span>
+        <div id="diag-suggestions" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+      <!-- Search bar -->
+      <div style="padding:6px 14px 10px;border-top:0.5px solid var(--gray-border);position:relative">
+        <div style="display:flex;align-items:center;gap:6px;background:var(--gray-bg);border:0.5px solid var(--gray-border-strong);border-radius:10px;padding:7px 11px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="diag-search" placeholder="Pesquisar ou escrever diagnóstico..." autocomplete="off"
+            style="flex:1;border:none;background:transparent;font-size:13px;color:var(--text);outline:none;font-family:inherit"
+            oninput="onDiagSearch()" onkeydown="onDiagSearchKey(event)">
+        </div>
+        <div id="diag-dropdown" style="display:none;position:absolute;left:14px;right:14px;top:calc(100% - 4px);background:var(--surface);border:0.5px solid var(--gray-border-strong);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:50;max-height:200px;overflow-y:auto"></div>
       </div>
     </div>
     <div class="btn-bar"><button class="btn" onclick="goTo(0)" style="flex:0.45">← Scan</button><button class="btn btn-primary" onclick="goTo(2)">Continuar →</button></div>
@@ -1428,18 +1441,141 @@ var DIAG_MAP = [
   { match: /traqueostomia percutânea/i,                           diag: 'Dependência ventilatória prolongada' },
 ];
 
-function inferDiagnosis() {
-  var sugg = document.getElementById('diag-suggestions');
-  var input = document.getElementById('f-diagnostico');
-  var badge = document.getElementById('diag-ai-badge');
+// ─── DIAGNOSIS MULTI-SELECT ───────────────────────────────────────────────────
+var selectedDiags = [];
 
-  if (!selectedProcs.length) {
-    sugg.innerHTML = '';
+// Master list for search
+var DIAG_LIST = [
+  // Colorrectal
+  'Neoplasia do cólon','Neoplasia do reto','Apendicite aguda','Doença hemorroidária',
+  'Fístula / abcesso perianal','Quisto pilonidal','Colite Ulcerosa','Doença de Crohn',
+  'Doença de Crohn / Colite Ulcerosa','Diverticulite aguda','Oclusão intestinal',
+  // HBP
+  'Colelitíase / Colecistite','Colangite','Neoplasia da cabeça do pâncreas',
+  'Neoplasia do corpo/cauda do pâncreas','Pancreatite aguda','Neoplasia hepática (primária ou metástases)',
+  'Metástases hepáticas','Neoplasia / Hipertensão portal / Trauma',
+  // Esófago-gástrico
+  'Neoplasia do esófago','Neoplasia gástrica','Obesidade mórbida','Obesidade mórbida supermórbida',
+  'Doença de refluxo gastroesofágico (DRGE)','Acalásia',
+  // Mama / parede
+  'Neoplasia da mama','Hérnia inguinal','Hérnia inguinal (laparoscopia)','Hérnia incisional',
+  'Hérnia umbilical','Hérnia epigástrica','Quisto sebáceo / Lipoma',
+  // Endócrino
+  'Neoplasia da tiróide / Bócio multinodular','Nódulo tiroideu / Bócio uninodular',
+  'Hiperparatiroidismo','Neoplasia suprarrenal / Feocromocitoma',
+  // Vascular periférico
+  'Insuficiência venosa crónica / Varizes',
+  'Necessidade de acesso venoso central para quimioterapia',
+  // Urologia
+  'HBP / Neoplasia da próstata','Neoplasia da próstata','Neoplasia da bexiga',
+  'Neoplasia da bexiga (suspeita/seguimento)','Hematúria / Seguimento de neoplasia vesical',
+  'Neoplasia do rim','Neoplasia do rim (pequena)','Neoplasia do urotelio superior',
+  'Litíase ureteral / Renal','Litíase / Obstrução ureteral',
+  'Neoplasia testicular','Criptorquidia','Incontinência urinária',
+  // Ginecologia
+  'Neoplasia do endométrio / Miomatose uterina','Prolapso génito-urinário / Miomatose',
+  'Miomatose uterina','Quisto ovárico','Neoplasia ovárica','Endometriose',
+  'Gravidez ectópica','Patologia tubária / Esterilização',
+  'Neoplasia ginecológica (estadiamento)','Neoplasia ginecológica',
+  'Infertilidade (PMA)','Patologia endometrial / Pólipos',
+  // Obstetrícia
+  'Gravidez de termo – cesariana eletiva','Sofrimento fetal agudo / Indicação obstétrica urgente',
+  'Trabalho de parto','Hemorragia pós-parto','Retenção placentária / Aborto',
+  'Incompetência colo uterino','Placenta prévia',
+  // Ortopedia
+  'Coxartrose','Gonartrose','Omartrose','Fratura do colo do fémur','Fratura do fémur',
+  'Rotura do LCA','Lesão meniscal','Rotura do manguito rotador',
+  'Estenose lombar / Hérnia discal lombar','Hérnia discal cervical / Estenose cervical',
+  'Fratura traumática','Trauma / Fratura','Neoplasia óssea',
+  // ORL
+  'Amigdalite crónica / SAOS','Neoplasia da laringe','Lesão das cordas vocais / Neoplasia glótica',
+  'Rinossinusite crónica / Polipose nasal','Desvio do septo nasal','Surdez neurossensorial',
+  'Otite média crónica / Colesteatoma','Neoplasia da cabeça e pescoço',
+  'Obstrução via aérea / Dependência ventilatória','Abcesso periamigdalino',
+  // Cardíaca
+  'Doença coronária multivaso','Estenose aórtica grave',
+  'Estenose aórtica grave (alto risco cirúrgico)','Doença valvular mitral',
+  'Insuficiência cardíaca terminal','Derrame pericárdico / Tamponamento',
+  'Fibrilhação auricular','Miocardiopatia hipertrófica',
+  // Torácica
+  'Neoplasia do pulmão','Neoplasia pulmonar / Metástase',
+  'Empiema pleural / Mesotelioma','Derrame pleural recorrente / Pneumotórax',
+  'Neoplasia mediastínica (estadiamento)','Timoma / Miastenia gravis',
+  // Vascular
+  'Aneurisma da aorta abdominal','Aneurisma / Disseção da aorta torácica',
+  'Doença arterial periférica oclusiva','Estenose carotídea',
+  'Isquemia crítica de membro / Diabetes','Insuficiência renal crónica (HD)',
+  'Isquemia aguda de membro',
+  // Neurocirurgia
+  'Neoplasia cerebral supratentorial','Neoplasia cerebral infratentorial',
+  'Aneurisma cerebral / HSA','HIC refratária / AVC maligno','Hematoma subdural',
+  'Adenoma hipofisário','Hidrocefalia / HIC','Estenose do canal lombar / Hérnia discal',
+  // Cirurgia Plástica
+  'Reconstrução pós-oncológica / Trauma','Neoplasia da mama (pós-mastectomia)',
+  'Ptose palpebral / Dermatocálase','Deformidade nasal',
+  'Excesso de pele abdominal / Pós-bariátrica','Lipodistrofia localizada',
+  'Lesão tendinosa (trauma)','Fratura da mão (trauma)','Trauma facial',
+  // Oftalmologia
+  'Catarata','Glaucoma','Descolamento da retina / Patologia vítrea',
+  'Descolamento da retina','Estrabismo','Neoplasia ocular / Olho cego doloroso',
+  'Obstrução do canal lacrimal',
+  // Pediatria
+  'Estenose hipertrófica do piloro','Doença de Hirschsprung',
+  'Malformação anorretal congénita','Atresia esofágica','Hérnia diafragmática congénita',
+  // Outros / Urgência
+  'Neoplasia (estadiamento)','Abdómen agudo / Neoplasia (estadiamento)',
+  'Dependência ventilatória prolongada','Sépsis / Choque séptico',
+  'Politrauma','Queimado grave','Dor crónica',
+];
+
+function renderDiagSelected() {
+  var wrap = document.getElementById('diag-selected');
+  var badge = document.getElementById('diag-ai-badge');
+  if (!wrap) return;
+  if (!selectedDiags.length) {
+    wrap.innerHTML = '<span style="font-size:13px;color:var(--text-faint);line-height:2">Nenhum diagnóstico selecionado</span>';
     badge.style.display = 'none';
     return;
   }
+  wrap.innerHTML = selectedDiags.map(function(d, i) {
+    var isAI = d.fromAI;
+    var cls = isAI ? 'sel-tag ai-tag' : 'sel-tag';
+    return '<div class="' + cls + '" onclick="removeDiag(' + i + ')">' + escHtml(d.name) + ' <span class="x">×</span></div>';
+  }).join('');
+}
 
-  // Find all matching diagnoses (avoid duplicates)
+function addDiag(name, fromAI) {
+  if (selectedDiags.find(function(d){ return d.name === name; })) return;
+  selectedDiags.push({ name: name, fromAI: !!fromAI });
+  renderDiagSelected();
+  // clear search
+  var inp = document.getElementById('diag-search');
+  if (inp) { inp.value = ''; }
+  hideDiagDropdown();
+}
+
+function removeDiag(i) {
+  selectedDiags.splice(i, 1);
+  renderDiagSelected();
+}
+
+function getDiagString() {
+  return selectedDiags.map(function(d){ return d.name; }).join(' | ');
+}
+
+function inferDiagnosis() {
+  var badge = document.getElementById('diag-ai-badge');
+  var suggWrap = document.getElementById('diag-sugg-wrap');
+  var sugg = document.getElementById('diag-suggestions');
+
+  if (!selectedProcs.length) {
+    if (suggWrap) suggWrap.style.display = 'none';
+    if (sugg) sugg.innerHTML = '';
+    renderDiagSelected();
+    return;
+  }
+
+  // Find all AI-inferred diagnoses from procedures
   var found = [];
   selectedProcs.forEach(function(proc) {
     DIAG_MAP.forEach(function(entry) {
@@ -1449,38 +1585,92 @@ function inferDiagnosis() {
     });
   });
 
-  if (!found.length) { sugg.innerHTML = ''; badge.style.display = 'none'; return; }
+  if (!found.length) {
+    if (suggWrap) suggWrap.style.display = 'none';
+    if (sugg) sugg.innerHTML = '';
+    return;
+  }
+
+  // Auto-add inferred ones not yet selected
+  found.forEach(function(d) {
+    if (!selectedDiags.find(function(s){ return s.name === d; })) {
+      addDiag(d, true);
+    }
+  });
 
   badge.style.display = 'inline-flex';
+  suggWrap.style.display = 'block';
 
-  // Render suggestion chips
+  // Render suggestion chips (show even if already added, greyed if so)
   sugg.innerHTML = found.map(function(d) {
-    return '<div class="chip ai-filled" style="font-size:12px" onclick="applyDiag(\'' + d.replace(/'/g,"&#39;") + '\')">' + d + '</div>';
+    var already = !!selectedDiags.find(function(s){ return s.name === d; });
+    var style = already
+      ? 'font-size:12px;opacity:0.45;cursor:default'
+      : 'font-size:12px;cursor:pointer';
+    var onclick = already ? '' : 'onclick="addDiag(\'' + d.replace(/'/g,"&#39;") + '\', true)"';
+    return '<div class="chip ai-filled" style="' + style + '" ' + onclick + '>' + escHtml(d) + (already ? ' ✓' : '') + '</div>';
+  }).join('');
+}
+
+function onDiagSearch() {
+  var q = (document.getElementById('diag-search').value || '').trim().toLowerCase();
+  var dd = document.getElementById('diag-dropdown');
+  if (!q) { hideDiagDropdown(); return; }
+
+  var matches = DIAG_LIST.filter(function(d) {
+    return d.toLowerCase().indexOf(q) !== -1;
+  }).slice(0, 8);
+
+  // Also check custom entry
+  var exactMatch = DIAG_LIST.find(function(d){ return d.toLowerCase() === q; });
+
+  var html = matches.map(function(d) {
+    var already = !!selectedDiags.find(function(s){ return s.name === d; });
+    return '<div onclick="addDiag(\'' + d.replace(/'/g,"&#39;") + '\')" style="padding:9px 14px;font-size:13px;border-bottom:0.5px solid var(--gray-border);cursor:pointer;color:' + (already ? 'var(--text-faint)' : 'var(--text)') + ';display:flex;align-items:center;justify-content:space-between" onmousedown="event.preventDefault()">'
+      + escHtml(d) + (already ? '<span style="font-size:11px;color:var(--green)">✓ adicionado</span>' : '') + '</div>';
   }).join('');
 
-  // Auto-apply first suggestion if field is empty or was previously auto-filled
-  if (!input.dataset.userEdited) {
-    input.value = found[0];
-    input.style.color = 'var(--green)';
+  // Add "write manually" option if no exact match
+  if (!exactMatch) {
+    var raw = document.getElementById('diag-search').value.trim();
+    html += '<div onclick="addDiagCustom()" style="padding:9px 14px;font-size:13px;cursor:pointer;color:var(--blue);font-weight:500" onmousedown="event.preventDefault()">+ Adicionar "<span id=\'diag-custom-preview\'>' + escHtml(raw) + '</span>"</div>';
   }
+
+  if (!html) { hideDiagDropdown(); return; }
+  dd.innerHTML = html;
+  dd.style.display = 'block';
 }
 
-function applyDiag(diag) {
-  var input = document.getElementById('f-diagnostico');
-  input.value = diag;
-  input.style.color = 'var(--green)';
-  input.dataset.userEdited = '';
+function addDiagCustom() {
+  var raw = (document.getElementById('diag-search').value || '').trim();
+  if (raw) addDiag(raw, false);
 }
 
-// Mark as user-edited when typed manually
+function onDiagSearchKey(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    var raw = (document.getElementById('diag-search').value || '').trim();
+    if (!raw) return;
+    // If there's exactly one dropdown match, add it; else add as custom
+    var q = raw.toLowerCase();
+    var matches = DIAG_LIST.filter(function(d){ return d.toLowerCase().indexOf(q) !== -1; });
+    if (matches.length === 1) { addDiag(matches[0], false); }
+    else { addDiag(raw, false); }
+  }
+  if (e.key === 'Escape') { hideDiagDropdown(); }
+}
+
+function hideDiagDropdown() {
+  var dd = document.getElementById('diag-dropdown');
+  if (dd) { dd.style.display = 'none'; dd.innerHTML = ''; }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-  var inp = document.getElementById('f-diagnostico');
-  if (inp) {
-    inp.addEventListener('input', function() {
-      inp.dataset.userEdited = '1';
-      inp.style.color = 'var(--text)';
-    });
-  }
+  renderDiagSelected();
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#diag-card')) hideDiagDropdown();
+  });
 });
 function renderSelected() {
   var el = document.getElementById('sel-display');
@@ -1572,7 +1762,7 @@ function buildReview() {
     ['Estágio', document.getElementById('f-estagio').value || '—'],
     ['Regime', document.getElementById('f-regime').value || '—'],
     ['Procedimento(s)', selectedProcs.join(' | ') || '—'],
-    ['Diagnóstico', document.getElementById('f-diagnostico').value || '—'],
+    ['Diagnóstico', getDiagString() || '—'],
     ['Dados do Doente', 'NSC: ' + (document.getElementById('f-nsc').value||'—') + ' | ' + (document.getElementById('f-sexo').value||'—') + ' | ' + (document.getElementById('f-idade').value||'—') + 'a | ' + (document.getElementById('f-peso').value||'—') + 'kg'],
     ['ASA', document.getElementById('f-asa').value || '—'],
     ['Técnica', getChips('chips-tec')],
@@ -1608,7 +1798,7 @@ function collectData() {
     estagio: document.getElementById('f-estagio').value,
     regime: document.getElementById('f-regime').value,
     procedimentos: selectedProcs.join(' | '),
-    diagnostico: document.getElementById('f-diagnostico').value,
+    diagnostico: getDiagString(),
     asa: document.getElementById('f-asa').value,
     
     tecnica_anest: tecFinal,
@@ -1698,13 +1888,13 @@ function submitRecord() {
 function newRecord() {
   editingIdx = null;
   selectedProcs = []; aiProcs = []; imageBase64 = null; renderSelected();
+  selectedDiags = []; renderDiagSelected();
+  document.getElementById('diag-suggestions').innerHTML = '';
+  document.getElementById('diag-sugg-wrap').style.display = 'none';
+  document.getElementById('diag-ai-badge').style.display = 'none';
   document.getElementById('proc-lists').innerHTML = '';
   document.getElementById('f-data').value = today;
-  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc','f-uces-num','f-tubo-size','f-vol-neuroeixo','f-vol-bnp','f-diagnostico'].forEach(function(id){ var el = document.getElementById(id); if(el){el.value='';} });
-  var diagInp = document.getElementById('f-diagnostico');
-  if (diagInp) { diagInp.dataset.userEdited = ''; diagInp.style.color = ''; }
-  var diagSugg = document.getElementById('diag-suggestions');
-  if (diagSugg) diagSugg.innerHTML = '';
+  ['f-nsc','f-idade','f-peso','f-altura','f-imc','f-estagio','f-sexo','f-destino','f-obs','custom-proc','f-uces-num','f-tubo-size','f-vol-neuroeixo','f-vol-bnp'].forEach(function(id){ var el = document.getElementById(id); if(el){el.value='';} });
   var diagBadge = document.getElementById('diag-ai-badge');
   if (diagBadge) diagBadge.style.display = 'none';
   document.getElementById('f-asa').selectedIndex = 1; document.getElementById('f-posicao').selectedIndex = 0;
@@ -2417,7 +2607,14 @@ function editCase(origIdx) {
   setVal('f-altura', r.altura);
   setVal('f-data', r.data);
   setVal('f-estagio', r.estagio);
-  setVal('f-diagnostico', r.diagnostico);
+  // Restaurar diagnósticos
+  selectedDiags = [];
+  if (r.diagnostico && r.diagnostico !== '—') {
+    r.diagnostico.split(/\s*\|\s*/).filter(Boolean).forEach(function(d) {
+      selectedDiags.push({ name: d.trim(), fromAI: false });
+    });
+  }
+  renderDiagSelected();
   setVal('f-obs', r.observacoes);
   setVal('f-posicao', r.posicionamento);
   setVal('f-destino', r.destino);
