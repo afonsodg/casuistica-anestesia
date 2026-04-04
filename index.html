@@ -646,9 +646,10 @@
     </div>
 
     <div class="card">
-      <div class="card-header">Monitorização adicional</div>
+      <div class="card-header">Monitorização</div>
       <div class="chip-wrap">
         <div class="chips" id="chips-mon">
+          <div class="chip on" onclick="toggle(this)">Standard ASA</div>
           <div class="chip" onclick="toggle(this)">BIS</div>
           <div class="chip" onclick="toggle(this)">TOF</div>
           <div class="chip" onclick="toggle(this)">PAI</div>
@@ -658,9 +659,9 @@
           <div class="chip" onclick="toggle(this)">PIC</div>
           <div class="chip" onclick="toggle(this)">Ecocardiografia</div>
           <div class="chip" onclick="toggle(this)">NIRS</div>
+          <div class="chip" onclick="toggle(this)">Potenciais evocados</div>
           <div class="chip" onclick="checkAutonomy(this, 'dc-box', false)">Débito cardíaco</div>
           <div class="chip" onclick="toggle(this)">PCWP (encravamento pulmonar)</div>
-          <div class="chip" onclick="toggle(this)">Nenhuma</div>
         </div>
         <div class="autonomy-bar hidden" id="dc-box">
           <span class="sublabel">Método de medição do DC</span>
@@ -1946,6 +1947,11 @@ function newRecord() {
   var tentChips = document.getElementById('chips-tentativas').querySelectorAll('.chip');
   tentChips[0].classList.add('on');
 
+  // Re-default Standard ASA sempre pré-selecionado
+  document.getElementById('chips-mon').querySelectorAll('.chip').forEach(function(c) {
+    if (c.textContent.trim() === 'Standard ASA') c.classList.add('on');
+  });
+
   setVAD(false); updateFarms(); checkExclusaoPulmonar(); goTo(0);
 }
 
@@ -2586,9 +2592,9 @@ function openCaseDetail(origIdx, chronoNum) {
   var bnp = Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '');
   var monit = Array.isArray(r.monitorizacao) ? r.monitorizacao.join(', ') : (r.monitorizacao || '');
   var neuroeixo = Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || '');
-  var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.join(', ') : (r.sangue_fluidos || '');
-  var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.join(', ') : (r.acesso_arterial || '');
-  var cvc = Array.isArray(r.cvc) ? r.cvc.join(', ') : (r.cvc || '');
+  var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.sangue_fluidos === '—' ? '' : (r.sangue_fluidos || ''));
+  var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.acesso_arterial === '—' ? '' : (r.acesso_arterial || ''));
+  var cvc = Array.isArray(r.cvc) ? r.cvc.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.cvc === '—' ? '' : (r.cvc || ''));
   var compl = r.complicacoes || 'Nenhuma';
 
   function row(label, value) {
