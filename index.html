@@ -660,9 +660,10 @@
     </div>
 
     <div class="card">
-      <div class="card-header">Monitorização adicional</div>
+      <div class="card-header">Monitorização</div>
       <div class="chip-wrap">
         <div class="chips" id="chips-mon">
+          <div class="chip on" onclick="toggle(this)">Standard ASA</div>
           <div class="chip" onclick="toggle(this)">BIS</div>
           <div class="chip" onclick="toggle(this)">TOF</div>
           <div class="chip" onclick="toggle(this)">PAI</div>
@@ -672,9 +673,9 @@
           <div class="chip" onclick="toggle(this)">PIC</div>
           <div class="chip" onclick="toggle(this)">Ecocardiografia</div>
           <div class="chip" onclick="toggle(this)">NIRS</div>
+          <div class="chip" onclick="toggle(this)">Potenciais evocados</div>
           <div class="chip" onclick="checkAutonomy(this, 'dc-box', false)">Débito cardíaco</div>
           <div class="chip" onclick="toggle(this)">PCWP (encravamento pulmonar)</div>
-          <div class="chip" onclick="toggle(this)">Nenhuma</div>
         </div>
         <div class="autonomy-bar hidden" id="dc-box">
           <span class="sublabel">Método de medição do DC</span>
@@ -1966,6 +1967,11 @@ function newRecord() {
   var tentChips = document.getElementById('chips-tentativas').querySelectorAll('.chip');
   tentChips[0].classList.add('on');
 
+  // Re-default Standard ASA sempre pré-selecionado
+  document.getElementById('chips-mon').querySelectorAll('.chip').forEach(function(c) {
+    if (c.textContent.trim() === 'Standard ASA') c.classList.add('on');
+  });
+
   setVAD(false); updateFarms(); checkExclusaoPulmonar(); goTo(0);
 }
 
@@ -2933,7 +2939,20 @@ function editCase(origIdx) {
     });
   }
 
-  setChips('chips-tec', r.tecnica_anest);
+  // Restaurar técnica — trata "Combinada (AG balanceada)" guardada como string especial
+  var tecnicaRaw = r.tecnica_anest || '';
+  var combMatch = tecnicaRaw.match(/^Combinada\s*\((.+)\)$/);
+  if (combMatch) {
+    // Activar chip Combinada e restaurar a base
+    var combChip = document.querySelector('#chips-tec .chip');
+    document.getElementById('chips-tec').querySelectorAll('.chip').forEach(function(c) {
+      if (c.textContent.trim() === 'Combinada') c.classList.add('on');
+    });
+    var combBaseEl = document.getElementById('f-comb-base');
+    if (combBaseEl) combBaseEl.value = combMatch[1];
+  } else {
+    setChips('chips-tec', tecnicaRaw);
+  }
   setChips('chips-dur', r.duracao);
   setChips('chips-inducao', r.farmacos_inducao_bal);
   setChips('chips-inducao-ina', r.farmacos_inducao_ina);
@@ -3069,6 +3088,10 @@ var today = new Date().toISOString().split('T')[0];
 document.getElementById('f-data').value = today;
 document.getElementById('tentativas-wrap').style.display = 'none';
 document.getElementById('chips-tentativas').querySelectorAll('.chip')[0].classList.add('on');
+// Standard ASA pré-selecionado por defeito
+document.getElementById('chips-mon').querySelectorAll('.chip').forEach(function(c) {
+  if (c.textContent.trim() === 'Standard ASA') c.classList.add('on');
+});
 loadSettings();
 </script>
 
