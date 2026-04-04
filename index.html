@@ -2624,9 +2624,9 @@ function openCaseDetail(origIdx, chronoNum) {
   ]) +
   section('Técnica Anestésica', [
     row('Técnica Anestésica', r.tecnica_anest || r.tecnica_anestesica),
-    row('Via aérea', r.abordagem_va),
-    (function(){ var va = (r.abordagem_va || '').toLowerCase(); return (va.indexOf('iot') !== -1 || va.indexOf('nasotraqueal') !== -1 || va.indexOf('submentoniana') !== -1) ? row('Método VA', r.metodo_va) : ''; })(),
-    row('Tubo OT', r.tubo_orotraqueal),
+    row('Via aérea', r.abord_va),
+    (function(){ var va = (r.abord_va || '').toLowerCase(); return (va.indexOf('iot') !== -1 || va.indexOf('nasotraqueal') !== -1 || va.indexOf('submentoniana') !== -1) ? row('Método VA', r.metodo_va) : ''; })(),
+    (function(){ return (r.vad_sim_nao || '').indexOf('Sim') !== -1 ? row('VAD', r.vad_criterios || 'Sim') : ''; })(),
     row('Técnica Loco-Regional', [neuroeixo, bnp].filter(function(v){ return v && v !== '—'; }).join(' · '))
   ]) +
   section('Monitorização & Acessos', [
