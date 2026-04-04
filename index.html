@@ -101,6 +101,8 @@
   
   /* SPECIFIC CHIPS */
   .chip.vad-on { background: var(--red-light); border-color: var(--red); color: var(--red); font-weight: 600; }
+  .chip.vad-crit { background: rgba(0,0,0,0.06); border-color: rgba(163,45,45,0.25); color: var(--text-muted); }
+  .chip.vad-crit.on { background: var(--red); border-color: var(--red); color: #fff; font-weight: 600; }
   .autonomy-bar { background: rgba(0,0,0,0.03); padding: 10px 12px; border-radius: 8px; margin-top: 8px; border: 1px dashed var(--gray-border-strong); }
   .autonomy-bar .sublabel { margin-bottom: 6px; font-weight: 500; color: var(--text-muted); }
   .autonomy-bar .chip { font-size: 12px; padding: 4px 10px; }
@@ -540,10 +542,10 @@
       <div class="chip-wrap" id="vad-criteria-wrap" style="display:none; background:var(--red-light); border-top: 1px solid #f0b2b2;">
         <span class="sublabel" style="color:var(--red); font-weight: 600;">Critérios de VAD</span>
         <div class="chips" id="chips-vad-crit">
-          <div class="chip vad-on" onclick="toggle(this)">Mallampati III / IV</div><div class="chip vad-on" onclick="toggle(this)">Dist. tiromentoniana &lt; 6cm</div>
-          <div class="chip vad-on" onclick="toggle(this)">Abertura bucal &lt; 3cm</div><div class="chip vad-on" onclick="toggle(this)">Mobilidade cervical ↓</div>
-          <div class="chip vad-on" onclick="toggle(this)">Teste mordida (ULBT) 3</div><div class="chip vad-on" onclick="toggle(this)">Pescoço curto/largo</div>
-          <div class="chip vad-on" onclick="toggle(this)">História de VAD</div>
+          <div class="chip vad-crit" onclick="toggleVADCrit(this)">Mallampati III / IV</div><div class="chip vad-crit" onclick="toggleVADCrit(this)">Dist. tiromentoniana &lt; 6cm</div>
+          <div class="chip vad-crit" onclick="toggleVADCrit(this)">Abertura bucal &lt; 3cm</div><div class="chip vad-crit" onclick="toggleVADCrit(this)">Mobilidade cervical ↓</div>
+          <div class="chip vad-crit" onclick="toggleVADCrit(this)">Teste mordida (ULBT) 3</div><div class="chip vad-crit" onclick="toggleVADCrit(this)">Pescoço curto/largo</div>
+          <div class="chip vad-crit" onclick="toggleVADCrit(this)">História de VAD</div>
         </div>
       </div>
     </div>
@@ -1161,6 +1163,10 @@ function setVAD(sim) {
   chips[0].classList.toggle('on', !sim); chips[1].classList.toggle('on', sim);
   document.getElementById('vad-criteria-wrap').style.display = sim ? 'block' : 'none';
   if (!sim) { document.getElementById('chips-vad-crit').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); }); }
+}
+
+function toggleVADCrit(el) {
+  el.classList.toggle('on');
 }
 
 // ─── LOGIC: EXCLUSÃO PULMONAR ─────────────────────────────────────────────────
