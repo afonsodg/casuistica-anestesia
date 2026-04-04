@@ -208,6 +208,20 @@
   .month-bar-lbl { font-size: 9px; color: var(--text-faint); text-align: center; }
   .month-bar-num { font-size: 9px; color: var(--blue-dark); font-weight: 600; }
 
+  /* ── PROCEDIMENTOS TAB ─────────────────────────────────────── */
+  .proc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .proc-table th { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; padding: 7px 14px; text-align: left; background: var(--gray-bg); border-bottom: 0.5px solid var(--gray-border); }
+  .proc-table th:not(:first-child) { text-align: center; }
+  .proc-table td { padding: 8px 14px; border-bottom: 0.5px solid var(--gray-border); color: var(--text); vertical-align: middle; }
+  .proc-table tr:last-child td { border-bottom: none; }
+  .proc-table td:not(:first-child) { text-align: center; font-weight: 600; }
+  .proc-table td.auto { color: var(--green); }
+  .proc-table td.ajuda { color: var(--blue-mid); }
+  .proc-table td.total-col { color: var(--text-muted); font-size: 12px; }
+  .proc-table td.zero { color: var(--text-faint); font-weight: 400; }
+  .proc-sub-label { font-size: 10px; color: var(--text-faint); font-weight: 400; }
+  .proc-section-title { padding: 10px 14px 2px; font-size: 10px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.5px; }
+
   /* ── HISTÓRICO OVERLAY ─────────────────────────────────────── */
   .hist-overlay { display: none; position: fixed; inset: 0; z-index: 160; background: var(--gray-bg); overflow: hidden; flex-direction: column; padding-top: var(--safe-top); }
   .hist-overlay.show { display: flex; }
@@ -646,10 +660,9 @@
     </div>
 
     <div class="card">
-      <div class="card-header">Monitorização</div>
+      <div class="card-header">Monitorização adicional</div>
       <div class="chip-wrap">
         <div class="chips" id="chips-mon">
-          <div class="chip on" onclick="toggle(this)">Standard ASA</div>
           <div class="chip" onclick="toggle(this)">BIS</div>
           <div class="chip" onclick="toggle(this)">TOF</div>
           <div class="chip" onclick="toggle(this)">PAI</div>
@@ -659,9 +672,9 @@
           <div class="chip" onclick="toggle(this)">PIC</div>
           <div class="chip" onclick="toggle(this)">Ecocardiografia</div>
           <div class="chip" onclick="toggle(this)">NIRS</div>
-          <div class="chip" onclick="toggle(this)">Potenciais evocados</div>
           <div class="chip" onclick="checkAutonomy(this, 'dc-box', false)">Débito cardíaco</div>
           <div class="chip" onclick="toggle(this)">PCWP (encravamento pulmonar)</div>
+          <div class="chip" onclick="toggle(this)">Nenhuma</div>
         </div>
         <div class="autonomy-bar hidden" id="dc-box">
           <span class="sublabel">Método de medição do DC</span>
@@ -864,6 +877,7 @@
       <div class="stat-tab active" id="tab-global" onclick="switchStatTab('global')">Global</div>
       <div class="stat-tab" id="tab-estagio" onclick="switchStatTab('estagio')">Por Estágio</div>
       <div class="stat-tab" id="tab-tempo" onclick="switchStatTab('tempo')">Evolução</div>
+      <div class="stat-tab" id="tab-procedimentos" onclick="switchStatTab('procedimentos')">Procedimentos</div>
     </div>
 
     <!-- TAB: GLOBAL -->
@@ -885,6 +899,11 @@
     <div class="stat-section" id="sec-tempo">
       <div class="stat-card" id="chart-timeline"></div>
       <div class="stat-card" id="chart-autonomia-evolucao"></div>
+    </div>
+
+    <!-- TAB: PROCEDIMENTOS -->
+    <div class="stat-section" id="sec-procedimentos">
+      <div id="proc-detail"></div>
     </div>
   </div>
 </div>
@@ -1947,11 +1966,6 @@ function newRecord() {
   var tentChips = document.getElementById('chips-tentativas').querySelectorAll('.chip');
   tentChips[0].classList.add('on');
 
-  // Re-default Standard ASA sempre pré-selecionado
-  document.getElementById('chips-mon').querySelectorAll('.chip').forEach(function(c) {
-    if (c.textContent.trim() === 'Standard ASA') c.classList.add('on');
-  });
-
   setVAD(false); updateFarms(); checkExclusaoPulmonar(); goTo(0);
 }
 
@@ -2362,6 +2376,197 @@ function renderStats() {
   // ── EVOLUÇÃO TAB ──
   renderTimeline(records);
   renderAutonomiaEvolucao(records);
+
+  // ── PROCEDIMENTOS TAB ──
+  renderProcedimentos(records);
+}
+
+// ─── PROCEDIMENTOS ────────────────────────────────────────────────────────────
+
+function renderProcedimentos(records) {
+  var el = document.getElementById('proc-detail');
+  if (!records.length) { el.innerHTML = '<div class="stat-empty">Sem registos ainda.</div>'; return; }
+
+  // Helper: check if autonomy string contains a value
+  function isAuto(v) { return (v||'').indexOf('Autónomo') !== -1; }
+  function isAjuda(v) { return (v||'').indexOf('Com ajuda') !== -1; }
+
+  // Helper: array from field
+  function arr(v) {
+    if (!v) return [];
+    if (Array.isArray(v)) return v;
+    return v.split(/,\s*|\s*\|\s*/).map(function(s){ return s.trim(); }).filter(Boolean);
+  }
+
+  // Build table HTML for a section
+  // rows: [{label, sublabel, auto, ajuda}]
+  function buildTable(title, rows) {
+    rows = rows.filter(function(r){ return r.auto + r.ajuda > 0; });
+    if (!rows.length) return '';
+    var total_auto = rows.reduce(function(s,r){ return s+r.auto; }, 0);
+    var total_ajuda = rows.reduce(function(s,r){ return s+r.ajuda; }, 0);
+    var html = '<div class="stat-card" style="margin-bottom:12px">';
+    html += '<div class="stat-card-header">' + title + '</div>';
+    html += '<table class="proc-table"><thead><tr>';
+    html += '<th>Técnica</th><th>Autónomo</th><th>Com ajuda</th><th>Total</th>';
+    html += '</tr></thead><tbody>';
+    rows.forEach(function(r) {
+      var tot = r.auto + r.ajuda;
+      html += '<tr>';
+      html += '<td>' + escHtml(r.label) + (r.sublabel ? '<br><span class="proc-sub-label">' + escHtml(r.sublabel) + '</span>' : '') + '</td>';
+      html += '<td class="auto' + (r.auto===0?' zero':'') + '">' + r.auto + '</td>';
+      html += '<td class="ajuda' + (r.ajuda===0?' zero':'') + '">' + r.ajuda + '</td>';
+      html += '<td class="total-col">' + tot + '</td>';
+      html += '</tr>';
+    });
+    // Totals row if more than 1 row
+    if (rows.length > 1) {
+      html += '<tr style="background:var(--gray-bg);font-weight:600">';
+      html += '<td style="font-size:11px;color:var(--text-muted)">Total</td>';
+      html += '<td class="auto">' + total_auto + '</td>';
+      html += '<td class="ajuda">' + total_ajuda + '</td>';
+      html += '<td class="total-col">' + (total_auto+total_ajuda) + '</td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  // ── VIA AÉREA ──
+  // IOT subdivided by método; others by abord_va
+  var vaRows = [
+    { key: 'iot-direta',    label: 'IOT', sublabel: 'Laringoscopia direta' },
+    { key: 'iot-video',     label: 'IOT', sublabel: 'Videolaringoscopia' },
+    { key: 'iot-fibro',     label: 'IOT', sublabel: 'Broncofibroscopia' },
+    { key: 'iot-awake',     label: 'IOT', sublabel: 'Awake intubation' },
+    { key: 'nasotraqueal',  label: 'Nasotraqueal', sublabel: '' },
+    { key: 'submentoniana', label: 'Submentoniana', sublabel: '' },
+  ];
+  var vaCounts = {};
+  vaRows.forEach(function(r){ vaCounts[r.key] = {auto:0, ajuda:0}; });
+
+  records.forEach(function(rec) {
+    var va = (rec.abord_va || '').toLowerCase();
+    var met = (rec.metodo_va || '').toLowerCase();
+    var aut = rec.autonomia_va || '';
+    var a = isAuto(aut) ? 'auto' : (isAjuda(aut) ? 'ajuda' : null);
+    if (!a) return;
+
+    if (va.indexOf('nasotraqueal') !== -1) { vaCounts['nasotraqueal'][a]++; }
+    else if (va.indexOf('submentoniana') !== -1) { vaCounts['submentoniana'][a]++; }
+    else if (va.indexOf('iot') !== -1 || va.indexOf('orotraqueal') !== -1) {
+      if (met.indexOf('videolaringoscopia') !== -1 || met.indexOf('vídeo') !== -1) { vaCounts['iot-video'][a]++; }
+      else if (met.indexOf('broncofibroscopia') !== -1) { vaCounts['iot-fibro'][a]++; }
+      else if (met.indexOf('awake') !== -1) { vaCounts['iot-awake'][a]++; }
+      else { vaCounts['iot-direta'][a]++; }
+    }
+  });
+
+  var vaTableRows = vaRows.map(function(r){ return { label: r.label, sublabel: r.sublabel, auto: vaCounts[r.key].auto, ajuda: vaCounts[r.key].ajuda }; });
+
+  // ── NEUROEIXO ──
+  var neuroKeys = ['Subaracnoideu','Epidural lombar','Epidural torácica','Sequencial'];
+  var neuroCounts = {};
+  neuroKeys.forEach(function(k){ neuroCounts[k] = {auto:0, ajuda:0}; });
+
+  records.forEach(function(rec) {
+    var tecArr = arr(rec.neuroeixo);
+    var aut = rec.autonomia_neuroeixo || '';
+    var a = isAuto(aut) ? 'auto' : (isAjuda(aut) ? 'ajuda' : null);
+    if (!a) return;
+    neuroKeys.forEach(function(k) {
+      tecArr.forEach(function(t){ if (t.toLowerCase().indexOf(k.toLowerCase()) !== -1) neuroCounts[k][a]++; });
+    });
+  });
+
+  var neuroTableRows = neuroKeys.map(function(k){ return { label: k, sublabel: '', auto: neuroCounts[k].auto, ajuda: neuroCounts[k].ajuda }; });
+
+  // ── BNP ──
+  var bnpMap = {};
+  records.forEach(function(rec) {
+    var bnpArr = arr(rec.bnp);
+    var aut = rec.autonomia_bnp || '';
+    var a = isAuto(aut) ? 'auto' : (isAjuda(aut) ? 'ajuda' : null);
+    if (!a) return;
+    bnpArr.forEach(function(b) {
+      b = b.trim();
+      if (!b || b === 'Nenhum') return;
+      if (!bnpMap[b]) bnpMap[b] = {auto:0, ajuda:0};
+      bnpMap[b][a]++;
+    });
+  });
+  var bnpTableRows = Object.keys(bnpMap).sort().map(function(k){ return { label: k, sublabel: '', auto: bnpMap[k].auto, ajuda: bnpMap[k].ajuda }; });
+
+  // ── LINHA ARTERIAL ──
+  // Keys: tipo × método (eco vs ref. anatómicas)
+  var artKeys = ['Linha radial','Linha umeral','Linha femoral'];
+  var artMap = {};
+  artKeys.forEach(function(k){
+    artMap[k+' (Ecoguiada)'] = {auto:0, ajuda:0};
+    artMap[k+' (Ref. anatómicas)'] = {auto:0, ajuda:0};
+  });
+
+  records.forEach(function(rec) {
+    var tipos = arr(rec.acesso_arterial);
+    var met = (rec.metodo_arterial || '').toLowerCase();
+    var aut = rec.autonomia_arterial || '';
+    var a = isAuto(aut) ? 'auto' : (isAjuda(aut) ? 'ajuda' : null);
+    if (!a || !tipos.length) return;
+    var eco = met.indexOf('eco') !== -1;
+    tipos.forEach(function(t) {
+      t = t.trim();
+      var suffix = eco ? ' (Ecoguiada)' : ' (Ref. anatómicas)';
+      var key = t + suffix;
+      if (!artMap[key]) artMap[key] = {auto:0, ajuda:0};
+      artMap[key][a]++;
+    });
+  });
+
+  var artTableRows = Object.keys(artMap).map(function(k){
+    var parts = k.split(' (');
+    return { label: parts[0], sublabel: parts[1] ? parts[1].replace(')','') : '', auto: artMap[k].auto, ajuda: artMap[k].ajuda };
+  });
+
+  // ── CVC ──
+  var cvcKeys = ['Jugular interno','Subclávia','Femoral','CVCTI','Bainha introdutora','Swan-Ganz','Cateter de diálise (Mahurkar)','DVE'];
+  var cvcMap = {};
+  cvcKeys.forEach(function(k){
+    cvcMap[k+' (Ecoguiado)'] = {auto:0, ajuda:0};
+    cvcMap[k+' (Ref. anatómicas)'] = {auto:0, ajuda:0};
+  });
+
+  records.forEach(function(rec) {
+    var tipos = arr(rec.cvc);
+    var met = (rec.metodo_cvc || '').toLowerCase();
+    var aut = rec.autonomia_cvc || '';
+    var a = isAuto(aut) ? 'auto' : (isAjuda(aut) ? 'ajuda' : null);
+    if (!a || !tipos.length) return;
+    var eco = met.indexOf('eco') !== -1;
+    tipos.forEach(function(t) {
+      t = t.trim();
+      var suffix = eco ? ' (Ecoguiado)' : ' (Ref. anatómicas)';
+      var key = t + suffix;
+      if (!cvcMap[key]) cvcMap[key] = {auto:0, ajuda:0};
+      cvcMap[key][a]++;
+    });
+  });
+
+  var cvcTableRows = Object.keys(cvcMap).map(function(k){
+    var parts = k.split(' (');
+    return { label: parts[0], sublabel: parts[1] ? parts[1].replace(')','') : '', auto: cvcMap[k].auto, ajuda: cvcMap[k].ajuda };
+  });
+
+  // ── RENDER ──
+  el.innerHTML =
+    buildTable('Via Aérea', vaTableRows) +
+    buildTable('Neuroeixo', neuroTableRows) +
+    (bnpTableRows.length ? buildTable('Bloqueios Nervosos Periféricos', bnpTableRows) : '') +
+    buildTable('Linha Arterial', artTableRows) +
+    buildTable('CVC / Acessos Centrais', cvcTableRows);
+
+  if (!el.innerHTML.trim()) {
+    el.innerHTML = '<div class="stat-empty">Sem dados de procedimentos registados.</div>';
+  }
 }
 
 function selectEstagioFilter(estagio) {
@@ -2592,9 +2797,9 @@ function openCaseDetail(origIdx, chronoNum) {
   var bnp = Array.isArray(r.bnp) ? r.bnp.join(', ') : (r.bnp || '');
   var monit = Array.isArray(r.monitorizacao) ? r.monitorizacao.join(', ') : (r.monitorizacao || '');
   var neuroeixo = Array.isArray(r.neuroeixo) ? r.neuroeixo.join(', ') : (r.neuroeixo || '');
-  var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.sangue_fluidos === '—' ? '' : (r.sangue_fluidos || ''));
-  var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.acesso_arterial === '—' ? '' : (r.acesso_arterial || ''));
-  var cvc = Array.isArray(r.cvc) ? r.cvc.filter(function(v){ return v && v !== '—'; }).join(', ') : (r.cvc === '—' ? '' : (r.cvc || ''));
+  var sangue = Array.isArray(r.sangue_fluidos) ? r.sangue_fluidos.join(', ') : (r.sangue_fluidos || '');
+  var acesso_art = Array.isArray(r.acesso_arterial) ? r.acesso_arterial.join(', ') : (r.acesso_arterial || '');
+  var cvc = Array.isArray(r.cvc) ? r.cvc.join(', ') : (r.cvc || '');
   var compl = r.complicacoes || 'Nenhuma';
 
   function row(label, value) {
