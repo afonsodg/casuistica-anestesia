@@ -2623,9 +2623,9 @@ function openCaseDetail(origIdx, chronoNum) {
     row('Destino pós-op', r.destino_pos_op)
   ]) +
   section('Técnica Anestésica', [
-    row('Técnica Anestésica', r.tecnica_anest || r.tecnica_anest || r.tecnica_anestesica),
-    row('Via aérea', r.abordagem_va),
-    row('Método VA', r.metodo_va),
+    row('Técnica Anestésica', r.tecnica_anest || r.tecnica_anestesica),
+    '<div class="case-row"><span class="case-row-label">Via aérea</span><span class="case-row-value">' + escHtml(r.abordagem_va || '—') + '</span></div>',
+    (function(){ var va = (r.abordagem_va || '').toLowerCase(); return (va.indexOf('iot') !== -1 || va.indexOf('nasotraqueal') !== -1 || va.indexOf('submentoniana') !== -1) ? row('Método VA', r.metodo_va) : ''; })(),
     row('Tubo OT', r.tubo_orotraqueal),
     row('Técnica Loco-Regional', [neuroeixo, bnp].filter(function(v){ return v && v !== '—'; }).join(' · '))
   ]) +
